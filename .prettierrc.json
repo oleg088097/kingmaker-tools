@@ -1,0 +1,30 @@
+{
+  "printWidth": 110,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "useTabs": false,
+  "endOfLine": "lf",
+  "semi": true,
+  "quoteProps": "as-needed",
+  "proseWrap": "preserve",
+  "overrides": [
+    {
+      "files": ["*.html"],
+      "options": {
+        "tabWidth": 2
+      }
+    },
+    {
+      "files": ["*.css", "*.scss", "*.sass"],
+      "options": {
+        "tabWidth": 2
+      }
+    },
+    {
+      "files": ["*.json"],
+      "options": {
+        "tabWidth": 2
+      }
+    }
+  ]
+}
