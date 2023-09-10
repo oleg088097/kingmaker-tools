@@ -8,6 +8,13 @@ export enum DICE_TYPE {
   D12 = 12,
   D20 = 20,
 }
+
+export interface DiceRollWithModifierResult {
+  rollRaw: number;
+  rollModifier: number;
+  rollTotal: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -16,7 +23,12 @@ export class DiceRollerService {
     return Math.ceil(Math.random() * diceType);
   }
 
-  public rollDiceWithModifier(diceType: DICE_TYPE, modifier: number): number {
-    return this.rollDice(diceType) + modifier;
+  public rollDiceWithModifier(diceType: DICE_TYPE, modifier: number): DiceRollWithModifierResult {
+    const rawRoll = this.rollDice(diceType);
+    return {
+      rollRaw: rawRoll,
+      rollModifier: modifier,
+      rollTotal: rawRoll + modifier,
+    };
   }
 }

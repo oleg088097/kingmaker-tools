@@ -6,5 +6,6 @@
   "endOfLine": "lf",
   "semi": true,
   "quoteProps": "as-needed",
-  "proseWrap": "preserve"
+  "proseWrap": "preserve",
+  "plugins": ["prettier-plugin-organize-imports"]
 }

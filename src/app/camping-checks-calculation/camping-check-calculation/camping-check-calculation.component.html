@@ -1,7 +1,45 @@
-<div>
-  <mat-form-field class="example-full-width">
-    <mat-label>Favorite food</mat-label>
-    <input matInput type="number" placeholder="Модификатор" value="0" />
-  </mat-form-field>
-  <button mat-button color="primary">Primary</button>
-</div>
+<mat-card>
+  <mat-card-content>
+    <div class="check-calculation">
+      <mat-form-field>
+        <mat-label>Название</mat-label>
+        <input matInput placeholder="Название" [formControl]="skillCheckForm.controls.title" />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Модификатор</mat-label>
+        <input
+          matInput
+          type="number"
+          placeholder="Модификатор"
+          [formControl]="skillCheckForm.controls.modifier"
+        />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Сложность</mat-label>
+        <input matInput type="number" placeholder="Сложность" [formControl]="skillCheckForm.controls.dc" />
+      </mat-form-field>
+      <button mat-button color="primary" (click)="doCheck()">Провести проверку</button>
+      <mat-chip-listbox *ngIf="checkResult()?.result as result">
+        <mat-chip
+          class="check-result-chip"
+          [color]="result?.resultInterpretation?.color"
+          disabled
+          [class.outdated]="checkResult().isResultOutdated"
+        >
+          <span class="check-result-text">{{ result?.resultInterpretation?.label }}</span>
+          <span class="check-result-text">
+            (
+            <span>{{ result?.rollTotal }}</span>
+            =
+            <span>{{ result?.rollRaw }}</span>
+            +
+            <span>{{ result?.rollModifier }}</span>
+            )
+          </span>
+        </mat-chip>
+      </mat-chip-listbox>
+      <span class="flex-spacer"></span>
+      <button mat-button color="primary" (click)="doRemove()">Убрать</button>
+    </div>
+  </mat-card-content>
+</mat-card>
