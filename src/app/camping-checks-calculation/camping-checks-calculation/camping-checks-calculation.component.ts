@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
-import { map, takeUntil } from 'rxjs';
+import { map, Subject, takeUntil } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { CampingChecksCalculationModuleState } from '../+state/+module-state';
 import {
@@ -20,6 +20,7 @@ import { SkillCheckFormValue } from '../camping-check-calculation/camping-check-
 })
 export class CampingChecksCalculationComponent {
   protected destroy$ = inject(DestroyService);
+  protected doAllChecks$ = new Subject<void>();
   protected store: Store<CampingChecksCalculationModuleState> = inject(Store);
   protected checksState: Signal<SkillCheckFormValue[]> = toSignal(
     this.store.select(campingChecksCalculationFeature.name).pipe(
@@ -58,7 +59,12 @@ export class CampingChecksCalculationComponent {
       }),
     );
   }
+
   protected trackBy(index: number, value: SkillCheckFormValue): string {
     return value.id;
+  }
+
+  protected doAllChecks(): void {
+    this.doAllChecks$.next();
   }
 }

@@ -1,7 +1,11 @@
 <app-camping-check-calculation
   *ngFor="let item of checksState(); trackBy: trackBy; let index = index"
   [skillCheckFormValue]="item"
+  [externalSkillCheck$]="doAllChecks$"
   (formUpdate)="doUpdate($event, index)"
   (remove)="doRemove(index)"
 ></app-camping-check-calculation>
-<button mat-button color="primary" (click)="addCheck()">Добавить проверку</button>
+<div class="action-buttons-wrapper">
+  <button mat-raised-button color="primary" (click)="doAllChecks()">Провести все проверки</button>
+  <button mat-raised-button color="accent" (click)="addCheck()">Добавить проверку</button>
+</div>

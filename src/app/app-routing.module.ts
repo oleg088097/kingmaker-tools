@@ -11,7 +11,7 @@ const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: '',
+    redirectTo: 'camping-checks',
     pathMatch: 'full',
   },
 ];

@@ -9,7 +9,7 @@ import {
   WritableSignal,
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { distinctUntilChanged, takeUntil } from 'rxjs';
+import { distinctUntilChanged, merge, Observable, Subject, takeUntil } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import {
   CHECK_RESULT,
@@ -72,8 +72,15 @@ export class CampingCheckCalculationComponent {
   @Input({ required: true }) set skillCheckFormValue(value: SkillCheckFormValue) {
     this.skillCheckForm.setValue(value, { emitEvent: false });
   }
+  @Input() set externalSkillCheck$(observable: Observable<void>) {
+    this.externalSkillCheckDestroy$.next();
+    observable
+      .pipe(takeUntil(merge(this.externalSkillCheckDestroy$, this.destroy$)))
+      .subscribe(() => this.doCheck());
+  }
   @Output() formUpdate: EventEmitter<SkillCheckFormValue> = new EventEmitter<SkillCheckFormValue>();
   @Output() remove: EventEmitter<void> = new EventEmitter<void>();
+  private externalSkillCheckDestroy$ = new Subject<void>();
   private destroy$ = inject(DestroyService);
   protected checkResult: WritableSignal<CampingCheckResult> = signal({
     result: null,

@@ -4,7 +4,9 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { StoreModule } from '@ngrx/store';
 import { campingChecksCalculationFeature } from './+state/camping-checks-calculation.state';
@@ -15,12 +17,14 @@ import { CampingChecksCalculationComponent } from './camping-checks-calculation/
   imports: [
     MatInputModule,
     MatButtonModule,
+    MatIconModule,
     RouterModule.forChild([{ path: '', component: CampingChecksCalculationComponent }]),
     MatCardModule,
     ReactiveFormsModule,
     CommonModule,
     MatChipsModule,
     StoreModule.forFeature(campingChecksCalculationFeature),
+    MatTooltipModule,
   ],
   declarations: [CampingCheckCalculationComponent, CampingChecksCalculationComponent],
   exports: [RouterModule],

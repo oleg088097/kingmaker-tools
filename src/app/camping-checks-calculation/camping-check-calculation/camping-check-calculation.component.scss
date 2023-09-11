@@ -1,4 +1,25 @@
+.check-calculation-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .check-calculation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.check-form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.check-action-result {
   display: flex;
   gap: 10px;
   align-items: center;
