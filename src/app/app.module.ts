@@ -4,37 +4,13 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ServiceWorkerModule } from '@angular/service-worker';
-import { Action, ActionReducer, StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { StoreModule } from '@ngrx/store';
 import { ActionReducerMap } from '@ngrx/store/src/models';
+import { GlobalEffects } from './+state/global.effects';
+import { loadStoreStateMetaReducer } from './+state/load-store-state-meta-reducer';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-
-// set state based on local storage
-export function persistStateReducer(_reducer: ActionReducer<{}>) {
-  //
-  const localStorageKey = '__store_state';
-  return (state: {} | undefined, action: Action) => {
-    if (state === undefined) {
-      const persisted = localStorage.getItem(localStorageKey);
-      return persisted ? JSON.parse(persisted) : _reducer(state, action);
-    }
-
-    const nextState = _reducer(state, action);
-    localStorage.setItem(localStorageKey, JSON.stringify(nextState));
-    return nextState;
-  };
-}
-
-// reset the whole state via the action's payload
-export function updateStateReducer(_reducer: ActionReducer<{}>) {
-  return (state: {} | undefined, action: Action) => {
-    if (action.type === 'LOAD_STORE_STATE') {
-      return (<any>action).payload.newState;
-    }
-
-    return _reducer(state, action);
-  };
-}
 
 @NgModule({
   declarations: [AppComponent],
@@ -43,8 +19,9 @@ export function updateStateReducer(_reducer: ActionReducer<{}>) {
     AppRoutingModule,
     BrowserAnimationsModule,
     StoreModule.forRoot({} as ActionReducerMap<unknown>, {
-      metaReducers: [persistStateReducer, updateStateReducer],
+      metaReducers: [loadStoreStateMetaReducer],
     }),
+    EffectsModule.forRoot(GlobalEffects),
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: !isDevMode(),
       // Register the ServiceWorker as soon as the application is stable

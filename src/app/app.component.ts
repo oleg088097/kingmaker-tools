@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { from, takeUntil } from 'rxjs';
+import { GlobalActions } from './+state/global.actions';
 import { DestroyService } from './utils/destroy.service';
 
 @Component({
@@ -14,7 +15,7 @@ export class AppComponent {
   protected destroy$ = inject(DestroyService);
 
   constructor() {
-    //JSON.parse(localStorage.getItem('state'))
+    this.store.dispatch(GlobalActions.loadStoreStateFromLocalStorage());
     if (navigator.storage && navigator.storage.persist) {
       from(navigator.storage.persist())
         .pipe(takeUntil(this.destroy$))
@@ -22,9 +23,5 @@ export class AppComponent {
           console.log(`Persisted storage granted: ${isPersisted}`);
         });
     }
-
-    /*this.store.pipe(debounceTime(1000),takeUntil(this.destroy$)).subscribe((state)=>{
-      localStorage.setItem('state', JSON.stringify(state));
-    })*/
   }
 }

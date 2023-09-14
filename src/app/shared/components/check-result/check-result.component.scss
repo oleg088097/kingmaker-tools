@@ -1,0 +1,30 @@
+mat-chip {
+  --mdc-chip-disabled-label-text-color: black;
+  --mdc-chip-label-text-weight: 800;
+  &.check-result-chip {
+    opacity: 1;
+    height: auto;
+    min-height: var(--mdc-chip-container-height);
+  }
+  &.outdated {
+    opacity: 0.1;
+  }
+  &.mat-green {
+    background: green;
+  }
+  &.mat-greenyellow {
+    background: greenyellow;
+  }
+  &.mat-orange {
+    background: orange;
+  }
+  &.mat-red {
+    background: red;
+  }
+}
+
+.check-result-text-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}

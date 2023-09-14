@@ -5,9 +5,7 @@ const routes: Routes = [
   {
     path: 'camping-checks',
     loadChildren: () =>
-      import('./camping-checks-calculation/camping-checks-calculation.module').then(
-        (m) => m.CampingChecksCalculationModule,
-      ),
+      import('./camping-calculation/camping-calculation.module').then((m) => m.CampingCalculationModule),
   },
   {
     path: '',

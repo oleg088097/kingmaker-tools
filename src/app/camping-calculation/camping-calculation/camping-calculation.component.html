@@ -1,0 +1,68 @@
+<mat-card>
+  <mat-card-actions class="controls-wrapper">
+    <mat-form-field subscriptSizing="dynamic">
+      <mat-label>DC</mat-label>
+      <input matInput type="number" placeholder="DC" [formControl]="dcFormControl" />
+    </mat-form-field>
+    <button mat-raised-button color="primary" (click)="doAllChecks()">Провести все проверки</button>
+  </mat-card-actions>
+  <table mat-table [dataSource]="campingCalculationState().checks" class="mat-elevation-z8">
+    <ng-container matColumnDef="title">
+      <th mat-header-cell *matHeaderCellDef>Проверка</th>
+      <td mat-cell *matCellDef="let element">{{ element.title }}</td>
+    </ng-container>
+    <ng-container matColumnDef="modifier">
+      <th mat-header-cell *matHeaderCellDef>Мод</th>
+      <td mat-cell *matCellDef="let element">
+        <mat-form-field class="small-form-field" subscriptSizing="dynamic">
+          <input
+            matInput
+            type="number"
+            placeholder="Мод"
+            [value]="element.modifier"
+            (change)="onModifierChange(element, $event)"
+          />
+        </mat-form-field>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="dc">
+      <th mat-header-cell *matHeaderCellDef>DC</th>
+      <td mat-cell *matCellDef="let element">
+        <mat-form-field
+          class="small-form-field"
+          *ngIf="element.dc !== undefined; else commonDc"
+          subscriptSizing="dynamic"
+        >
+          <input
+            matInput
+            type="number"
+            placeholder="DC"
+            [value]="element.dc"
+            (change)="onDcChange(element, $event)"
+          />
+        </mat-form-field>
+        <ng-template #commonDc>{{ campingCalculationState().commonDc }}</ng-template>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="outcome">
+      <th mat-header-cell *matHeaderCellDef>Результат</th>
+      <td
+        mat-cell
+        *matCellDef="let element"
+        matTooltipPosition="left"
+        [matTooltip]="getResultTooltip(element.id)"
+      >
+        <app-check-result
+          [isResultOutdated]="checksOutdated()"
+          [checkResult]="checkResults().get(element.id)"
+        />
+        <div class="check-outcome-extended-description" [class.outdated]="checksOutdated()">
+          {{ getResultTooltip(element.id) }}
+        </div>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+</mat-card>

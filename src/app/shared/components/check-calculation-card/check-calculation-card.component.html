@@ -25,25 +25,10 @@
           <button mat-mini-fab color="primary" (click)="doCheck()" matTooltip="Провести проверку">
             <mat-icon>double_arrow</mat-icon>
           </button>
-          <mat-chip-listbox *ngIf="checkResult()?.result as result">
-            <mat-chip
-              class="check-result-chip"
-              [color]="result?.resultInterpretation?.color"
-              disabled
-              [class.outdated]="checkResult().isResultOutdated"
-            >
-              <span class="check-result-text">{{ result?.resultInterpretation?.label }}</span>
-              <span class="check-result-text">
-                (
-                <span>{{ result?.rollTotal }}</span>
-                =
-                <span>{{ result?.rollRaw }}</span>
-                +
-                <span>{{ result?.rollModifier }}</span>
-                )
-              </span>
-            </mat-chip>
-          </mat-chip-listbox>
+          <app-check-result
+            [isResultOutdated]="checkResultState().isResultOutdated"
+            [checkResult]="checkResultState().result"
+          />
         </div>
       </div>
       <button mat-mini-fab color="primary" (click)="doRemove()" matTooltip="Убрать">

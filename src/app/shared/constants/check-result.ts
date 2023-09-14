@@ -1,0 +1,6 @@
+export enum CHECK_RESULT {
+  CRIT_SUCCESS,
+  SUCCESS,
+  FAIL,
+  CRIT_FAIL,
+}

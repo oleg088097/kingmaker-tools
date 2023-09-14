@@ -1,21 +1,16 @@
 import { inject, Injectable } from '@angular/core';
+import { CHECK_RESULT } from '../constants/check-result';
 import { DICE_TYPE, DiceRollerService, DiceRollWithModifierResult } from './dice-roller.service';
 
-export enum CHECK_RESULT {
-  CRIT_SUCCESS,
-  SUCCESS,
-  FAIL,
-  CRIT_FAIL,
-}
-export type SkillCheckResult = DiceRollWithModifierResult & { checkResult: CHECK_RESULT };
+export type CheckResult = DiceRollWithModifierResult & { checkResult: CHECK_RESULT };
 
 @Injectable({
   providedIn: 'root',
 })
-export class SkillCheckPerformerService {
+export class CheckPerformerService {
   private readonly diceRollerService: DiceRollerService = inject(DiceRollerService);
 
-  public checkSkill(modifier: number, targetDC: number): SkillCheckResult {
+  public checkSkill(modifier: number, targetDC: number): CheckResult {
     const rollResult = this.diceRollerService.rollDiceWithModifier(DICE_TYPE.D20, modifier);
     let checkResult: CHECK_RESULT;
     if (rollResult.rollTotal >= targetDC + 10) {
