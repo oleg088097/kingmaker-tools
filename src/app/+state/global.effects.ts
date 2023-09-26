@@ -11,6 +11,8 @@ interface AppStateVersioned {
 const CURRENT_STATE_VERSION = 1;
 const STATE_STORAGE_KEY = '__store_state';
 
+// For global migrations
+// specific reducer should use its version field to migrate in GlobalActions.loadStoreState handler
 function migrateState(state: AppStateVersioned): AppStateVersioned {
   return state;
 }
@@ -21,10 +23,10 @@ export class GlobalEffects {
   private store: Store = inject(Store);
   private persistState: boolean = false;
 
-  updatePersistState$ = createEffect(
+  activateStatePersistence$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(GlobalActions.activateStatePersistance),
+        ofType(GlobalActions.activateStatePersistence),
         tap(() => (this.persistState = true)),
       ),
     { dispatch: false },
@@ -49,7 +51,7 @@ export class GlobalEffects {
         if (globalState) {
           return GlobalActions.loadStoreState({ globalState: migrateState(globalState).state });
         } else {
-          return GlobalActions.activateStatePersistance();
+          return GlobalActions.activateStatePersistence();
         }
       }),
     ),
@@ -58,7 +60,7 @@ export class GlobalEffects {
   loadStoreState$ = createEffect(() =>
     this.actions$.pipe(
       ofType(GlobalActions.loadStoreState),
-      map(() => GlobalActions.activateStatePersistance()),
+      map(() => GlobalActions.activateStatePersistence()),
     ),
   );
 }

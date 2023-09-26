@@ -8,6 +8,10 @@ const routes: Routes = [
       import('./camping-calculation/camping-calculation.module').then((m) => m.CampingCalculationModule),
   },
   {
+    path: 'travel-map',
+    loadChildren: () => import('./travel-map/travel-map.module').then((m) => m.TravelMapModule),
+  },
+  {
     path: '',
     redirectTo: 'camping-checks',
     pathMatch: 'full',

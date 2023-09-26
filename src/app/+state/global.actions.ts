@@ -8,7 +8,8 @@ export interface LoadStoreStatePayload {
 export const GlobalActions = createActionGroup({
   source: 'Global',
   events: {
-    activateStatePersistance: emptyProps(),
+    activateStatePersistence: emptyProps(),
+    // Can use GlobalActions.loadStoreState in specific reducer to migrate state via version field of that specific reducer state
     loadStoreState: props<LoadStoreStatePayload>(),
     loadStoreStateFromLocalStorage: emptyProps(),
   },

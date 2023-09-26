@@ -1,0 +1,10 @@
+<mat-progress-spinner *ngIf="loading(); else content" mode="indeterminate" />
+<ng-template #content>
+  <app-map-controls-overlay (contextmenu)="openContextMenu($event)">
+    <app-map-area-overlay>
+      <app-map-mesh-overlay>
+        <app-map-image />
+      </app-map-mesh-overlay>
+    </app-map-area-overlay>
+  </app-map-controls-overlay>
+</ng-template>

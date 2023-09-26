@@ -6,6 +6,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { ActionReducerMap } from '@ngrx/store/src/models';
 import { GlobalEffects } from './+state/global.effects';
 import { loadStoreStateMetaReducer } from './+state/load-store-state-meta-reducer';
@@ -19,7 +20,21 @@ import { AppComponent } from './app.component';
     AppRoutingModule,
     BrowserAnimationsModule,
     StoreModule.forRoot({} as ActionReducerMap<unknown>, {
+      runtimeChecks: {
+        strictStateImmutability: true,
+        strictActionImmutability: true,
+        strictStateSerializability: true,
+        strictActionSerializability: true,
+      },
       metaReducers: [loadStoreStateMetaReducer],
+    }),
+    StoreDevtoolsModule.instrument({
+      maxAge: 25,
+      logOnly: !isDevMode(),
+      autoPause: true,
+      trace: false,
+      traceLimit: 75,
+      connectOutsideZone: true,
     }),
     EffectsModule.forRoot(GlobalEffects),
     ServiceWorkerModule.register('ngsw-worker.js', {

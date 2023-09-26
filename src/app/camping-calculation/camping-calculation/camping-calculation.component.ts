@@ -60,7 +60,7 @@ export class CampingCalculationComponent {
       .get<CampingData>('/assets/data/camping-checks.json')
       .pipe(takeUntil(this.destroy$))
       .subscribe((data) => {
-        this.store.dispatch(CampingCalculationActions.fromData({ data }));
+        this.store.dispatch(CampingCalculationActions.fromSeed({ data }));
         this.checksInfo.set(new Map(data.checks.map((checkInfo) => [checkInfo.id, checkInfo])));
         this.loading.set(false);
       });

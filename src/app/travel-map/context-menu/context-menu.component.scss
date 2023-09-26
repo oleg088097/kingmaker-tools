@@ -1,0 +1,15 @@
+mat-card-content {
+  padding: 0;
+  &:first-child {
+    padding: 0;
+  }
+}
+.button-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+hr {
+  margin-inline-start: 5px;
+  margin-inline-end: 5px;
+}

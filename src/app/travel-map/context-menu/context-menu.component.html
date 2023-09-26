@@ -1,0 +1,23 @@
+<mat-card>
+  <mat-card-content>
+    <mat-action-list cdkMenu>
+      <button mat-list-item cdkMenuItem (click)="switchFogForMeshElement()">
+        {{ mesh().fog ? 'Убрать туман' : 'Добавить туман' }}
+      </button>
+      <hr />
+      <button mat-list-item cdkMenuItem *ngIf="areas().length" [cdkMenuTriggerFor]="area">
+        <span class="button-content">Области <mat-icon>arrow_right</mat-icon></span>
+      </button>
+    </mat-action-list>
+  </mat-card-content>
+</mat-card>
+<ng-template #area>
+  <mat-card>
+    <mat-card-content cdkMenu>
+      <mat-action-list>
+        <button mat-list-item cdkMenuItem>Области 1</button>
+        <button mat-list-item cdkMenuItem>Области 2</button>
+      </mat-action-list>
+    </mat-card-content>
+  </mat-card>
+</ng-template>

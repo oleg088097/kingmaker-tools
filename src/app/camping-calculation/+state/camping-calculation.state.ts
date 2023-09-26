@@ -19,7 +19,7 @@ export interface CampingData {
 export const CampingCalculationActions = createActionGroup({
   source: 'Camping Calculation',
   events: {
-    fromData: props<{ data: CampingData }>(),
+    fromSeed: props<{ data: CampingData }>(),
     updateCheck: props<{ value: CheckDescriptionOptionalDc }>(),
     updateCommonDc: props<{ value: number }>(),
   },
@@ -31,13 +31,13 @@ export interface CampingCalculationState {
 }
 
 interface CampingCalculationStateInternal extends CampingCalculationState {
-  dataVersion: number;
+  seedVersion: number;
   version: number;
 }
 
 const initialState: CampingCalculationStateInternal = {
   version: 1,
-  dataVersion: 0,
+  seedVersion: 0,
   commonDc: 20,
   checks: [],
 };
@@ -53,13 +53,13 @@ export const campingCalculationFeature = createFeature({
         checks: [...state.checks.slice(0, index), props.value, ...state.checks.slice(index + 1)],
       };
     }),
-    on(CampingCalculationActions.fromData, (state, props): CampingCalculationStateInternal => {
-      if (state.dataVersion === props.data.version) {
+    on(CampingCalculationActions.fromSeed, (state, props): CampingCalculationStateInternal => {
+      if (state.seedVersion === props.data.version) {
         return state;
       }
       return {
         ...state,
-        dataVersion: props.data.version,
+        seedVersion: props.data.version,
         checks: props.data.checks.map((updatedCheck) => {
           const storedState = state.checks.find((storedCheck) => storedCheck.id === updatedCheck.id);
           return {

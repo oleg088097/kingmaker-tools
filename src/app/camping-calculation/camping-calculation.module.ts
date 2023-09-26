@@ -4,9 +4,8 @@ import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
@@ -19,17 +18,16 @@ import { CampingCalculationComponent } from './camping-calculation/camping-calcu
   imports: [
     MatInputModule,
     MatButtonModule,
-    MatIconModule,
     RouterModule.forChild([{ path: '', component: CampingCalculationComponent }]),
     MatCardModule,
     ReactiveFormsModule,
     CommonModule,
-    MatChipsModule,
     StoreModule.forFeature(campingCalculationFeature),
     MatTooltipModule,
     MatTableModule,
     CheckResultComponent,
     HttpClientModule,
+    MatProgressSpinnerModule,
   ],
   declarations: [CampingCalculationComponent],
   exports: [RouterModule],
