@@ -1,14 +1,18 @@
 {
-  "env": {
-    "browser": true,
-    "es2021": true
-  },
-  "ignorePatterns": ["**/*"],
+  "root": true,
+  "ignorePatterns": ["projects/**/*"],
   "overrides": [
     {
+      "files": ["*.ts"],
       "plugins": ["prettier", "rxjs", "unused-imports"],
-      "extends": ["standard-with-typescript", "plugin:prettier/recommended", "plugin:rxjs/recommended"],
-      "files": ["*.ts", "*.tsx"],
+      "extends": [
+        "standard-with-typescript",
+        "plugin:prettier/recommended",
+        "plugin:rxjs/recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@angular-eslint/recommended",
+        "plugin:@angular-eslint/template/process-inline-templates"
+      ],
       "parser": "@typescript-eslint/parser",
       "parserOptions": {
         "project": ["./tsconfig.json"],
@@ -24,8 +28,32 @@
         "unused-imports/no-unused-vars": [
           "warn",
           { "vars": "all", "varsIgnorePattern": "^_", "args": "after-used", "argsIgnorePattern": "^_" }
+        ],
+        "@angular-eslint/directive-selector": [
+          "error",
+          {
+            "type": "attribute",
+            "prefix": "app",
+            "style": "camelCase"
+          }
+        ],
+        "@angular-eslint/component-selector": [
+          "error",
+          {
+            "type": "element",
+            "prefix": "app",
+            "style": "kebab-case"
+          }
         ]
       }
+    },
+    {
+      "files": ["*.html"],
+      "extends": [
+        "plugin:@angular-eslint/template/recommended",
+        "plugin:@angular-eslint/template/accessibility"
+      ],
+      "rules": {}
     }
   ]
 }
