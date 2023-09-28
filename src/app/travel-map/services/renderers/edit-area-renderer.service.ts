@@ -48,7 +48,7 @@ export class EditAreaRendererService implements Renderer {
     const editAreaState = this.editAreaState();
     const meshState = this.meshState();
 
-    if (editAreaState?.meshElementIds == null || editAreaState?.meshElementIds?.length === 0) {
+    if (editAreaState == null) {
       this.editAreaRender = null;
       return;
     }
@@ -56,21 +56,23 @@ export class EditAreaRendererService implements Renderer {
     const areaMeshTiles: MeshTileRender[] = [];
     for (const meshElement of Object.values(meshState.meshMap)) {
       const meshRender = this.impl().getMeshTileRender(meshElement.id, meshState);
-      if (editAreaState.meshElementIds.includes(meshElement.id)) {
+      if (editAreaState.meshElementIds?.includes(meshElement.id) === true) {
         areaMeshTiles.push(meshRender);
       } else {
         this.redrawAvailableForSelectionTile(meshRender, ctx);
       }
     }
 
-    this.editAreaRender = {
-      path: areaMeshTiles.reduce((acc, elem) => {
-        acc.addPath(elem.path);
-        return acc;
-      }, new Path2D()),
-      meshTileRenders: areaMeshTiles,
-    };
-    this.redrawEditArea(editAreaState, ctx);
+    if (areaMeshTiles.length > 0) {
+      this.editAreaRender = {
+        path: areaMeshTiles.reduce((acc, elem) => {
+          acc.addPath(elem.path);
+          return acc;
+        }, new Path2D()),
+        meshTileRenders: areaMeshTiles,
+      };
+      this.redrawEditArea(editAreaState, ctx);
+    }
   }
 
   public getCoordsElements(x: number, y: number, ctx: CanvasRenderingContext2D): string[] {

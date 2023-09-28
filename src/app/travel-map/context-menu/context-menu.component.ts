@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, inject, InjectionToken, type Signal
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { map, takeUntil } from 'rxjs';
+import { v4 as uuidv4 } from 'uuid';
 import { type TravelMapModuleState } from '../+state/+module-state';
 import { TravelMapAreasActions, travelMapAreasFeature } from '../+state/travel-map-area.state';
 import { TravelMapMeshActions, travelMapMeshFeature } from '../+state/travel-map-mesh.state';
@@ -69,7 +70,7 @@ export class ContextMenuComponent {
     this.overlayRef.dispose();
   }
 
-  protected editArea(area: MapAreaState): void {
+  protected editArea(area: Partial<MapAreaState>): void {
     this.store.dispatch(
       TravelMapAreasActions.updateEditArea({
         value: {
@@ -78,5 +79,11 @@ export class ContextMenuComponent {
       }),
     );
     this.overlayRef.dispose();
+  }
+
+  protected getEmptyAreaState(): Partial<MapAreaState> {
+    return {
+      id: uuidv4(),
+    };
   }
 }

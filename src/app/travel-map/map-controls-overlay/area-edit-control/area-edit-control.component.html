@@ -2,8 +2,8 @@
   <mat-card-content>
     <div class="area-edit-controls-wrapper" [class.hide-area-edit-control]="isHideDisplayControls()">
       <mat-form-field>
-        <mat-label>Название зоны</mat-label>
-        <input matInput placeholder="Название" [formControl]="areaForm.controls.title" />
+        <mat-label>Название области</mat-label>
+        <input matInput placeholder="Название области" [formControl]="areaForm.controls.title" />
       </mat-form-field>
       <mat-form-field>
         <mat-label>Цвет</mat-label>
@@ -17,7 +17,7 @@
       </mat-form-field>
       <span class="area-edit-action-buttons">
         <button mat-raised-button color="accent" (click)="cancel()">Отменить</button>
-        <button mat-raised-button color="primary" (click)="save()" [disabled]="isFormNotValid()">
+        <button mat-raised-button color="primary" (click)="save()" [disabled]="isAreaNotValid()">
           Сохранить
         </button>
       </span>

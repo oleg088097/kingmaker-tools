@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
   inject,
   signal,
@@ -56,12 +57,19 @@ export class AreaEditControlComponent {
     }),
   });
 
-  protected readonly isFormNotValid: Signal<boolean> = toSignal(
+  protected readonly isFormValid: Signal<boolean> = toSignal(
     this.areaForm.statusChanges.pipe(
       startWith(this.areaForm.status),
-      map((status) => status !== 'VALID'),
+      map((status) => status === 'VALID'),
     ),
     { requireSync: true },
+  );
+
+  protected readonly isAreaNotValid: Signal<boolean> = computed(
+    () =>
+      !this.isFormValid() ||
+      this.editAreaState()?.meshElementIds == null ||
+      this.editAreaState()?.meshElementIds?.length === 0,
   );
 
   public constructor() {

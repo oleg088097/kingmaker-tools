@@ -4,8 +4,11 @@
       <button mat-list-item cdkMenuItem (click)="switchFogForMeshElement()">
         {{ mesh().fog ? 'Убрать туман' : 'Добавить туман' }}
       </button>
+      <hr />
+      <button mat-list-item cdkMenuItem *ngIf="!editAreaState()" (click)="editArea(getEmptyAreaState())">
+        Создать область
+      </button>
       <ng-container *ngIf="areas().length">
-        <hr />
         <button mat-list-item cdkMenuItem *ngIf="!editAreaState()" [cdkMenuTriggerFor]="area">
           <span class="button-content">Редактировать область <mat-icon>arrow_right</mat-icon></span>
         </button>
