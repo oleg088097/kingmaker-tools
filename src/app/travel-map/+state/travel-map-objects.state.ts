@@ -1,8 +1,8 @@
 import { createActionGroup, createFeature, createReducer, on, props } from '@ngrx/store';
 import { cloneDeep } from 'lodash';
-import { MapObjectState } from '../interfaces/map-object-state';
-import { TravelMapData } from '../interfaces/travel-map-data';
-import { VersionedState } from './versioned-state';
+import { type MapObjectState } from '../interfaces/map-object-state';
+import { type TravelMapData } from '../interfaces/travel-map-data';
+import { type VersionedState } from './versioned-state';
 
 export const TravelMapObjectsActions = createActionGroup({
   source: 'Travel Map Objects',

@@ -1,14 +1,14 @@
-import { OverlayRef } from '@angular/cdk/overlay';
-import { ChangeDetectionStrategy, Component, inject, InjectionToken, Signal } from '@angular/core';
+import { type OverlayRef } from '@angular/cdk/overlay';
+import { ChangeDetectionStrategy, Component, inject, InjectionToken, type Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { map, takeUntil } from 'rxjs';
-import { TravelMapModuleState } from '../+state/+module-state';
-import { travelMapAreasFeature } from '../+state/travel-map-area.state';
+import { type TravelMapModuleState } from '../+state/+module-state';
+import { TravelMapAreasActions, travelMapAreasFeature } from '../+state/travel-map-area.state';
 import { TravelMapMeshActions, travelMapMeshFeature } from '../+state/travel-map-mesh.state';
 import { DestroyService } from '../../utils/destroy.service';
-import { MapAreaState } from '../interfaces/map-area-state';
-import { MeshElementState } from '../interfaces/mesh-element-state';
+import { type MapAreaState } from '../interfaces/map-area-state';
+import { type MeshElementState } from '../interfaces/mesh-element-state';
 
 export interface ContextMenuData {
   meshId: string;
@@ -50,17 +50,33 @@ export class ContextMenuComponent {
     { requireSync: true },
   );
 
+  protected editAreaState: Signal<Partial<MapAreaState> | null> = toSignal(
+    this.store.select(travelMapAreasFeature.selectEditArea),
+    {
+      requireSync: true,
+    },
+  );
+
   protected switchFogForMeshElement(): void {
-    if (this.mesh) {
-      this.store.dispatch(
-        TravelMapMeshActions.upsertMeshElement({
-          value: {
-            ...this.mesh(),
-            fog: !this.mesh().fog,
-          },
-        }),
-      );
-    }
+    this.store.dispatch(
+      TravelMapMeshActions.upsertMeshElement({
+        value: {
+          ...this.mesh(),
+          fog: !this.mesh().fog,
+        },
+      }),
+    );
+    this.overlayRef.dispose();
+  }
+
+  protected editArea(area: MapAreaState): void {
+    this.store.dispatch(
+      TravelMapAreasActions.updateEditArea({
+        value: {
+          ...area,
+        },
+      }),
+    );
     this.overlayRef.dispose();
   }
 }

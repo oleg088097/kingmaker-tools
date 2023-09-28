@@ -1,9 +1,15 @@
 import { createActionGroup, createFeature, createReducer, on, props } from '@ngrx/store';
 import { cloneDeep } from 'lodash';
-import { MeshElementState } from '../interfaces/mesh-element-state';
-import { AXIS, MESH_TYPE, MeshProperties, ROW_TYPE, TravelMapData } from '../interfaces/travel-map-data';
-import { MeshIdConverter } from '../utils/mesh-id-converter';
-import { VersionedState } from './versioned-state';
+import { type MeshElementState } from '../interfaces/mesh-element-state';
+import {
+  AXIS,
+  MESH_TYPE,
+  ROW_TYPE,
+  type MeshProperties,
+  type TravelMapData,
+} from '../interfaces/travel-map-data';
+import { convertCoordinatesToMeshId } from '../utils/mesh-id-converter';
+import { type VersionedState } from './versioned-state';
 
 export const TravelMapMeshActions = createActionGroup({
   source: 'Travel Map Mesh',
@@ -70,7 +76,7 @@ export const travelMapMeshFeature = createFeature({
               }
             }
 
-            const id = MeshIdConverter.convertCoordinatesToMeshId(y, x);
+            const id = convertCoordinatesToMeshId(y, x);
             meshMap[id] = Object.assign(
               {
                 id,
@@ -84,7 +90,7 @@ export const travelMapMeshFeature = createFeature({
         }
       } else {
         // TODO add square support
-        throw 'not supported';
+        throw new Error('not supported');
       }
       return {
         ...state,

@@ -1,6 +1,6 @@
-import { MapAreaState } from './map-area-state';
-import { MapObjectState } from './map-object-state';
-import { MeshElementState } from './mesh-element-state';
+import { type MapAreaState } from './map-area-state';
+import { type MapObjectState } from './map-object-state';
+import { type MeshElementState } from './mesh-element-state';
 
 export enum MESH_TYPE {
   HEX = 'HEX',
@@ -38,6 +38,11 @@ export interface MeshProperties {
 
 export interface TravelMapData {
   version: number;
+  image: {
+    width: number;
+    height: number;
+    url: string;
+  };
   mesh: {
     properties: MeshProperties;
     meshMap: Record<string, MeshElementState>;

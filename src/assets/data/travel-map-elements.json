@@ -8,9 +8,15 @@
       "comment": "greenBelt",
       "meshElementIds": ["A19", "A20", "A21", "B19", "B20", "B21", "C19", "C20", "C21"],
       "type": "",
-      "color": "green",
-      "groups": []
+      "color": "#008000",
+      "groups": [],
+      "hidden": false
     }
+  },
+  "image": {
+    "width": 6450,
+    "height": 2250,
+    "url": "/assets/img/map.png"
   },
   "mesh": {
     "properties": {

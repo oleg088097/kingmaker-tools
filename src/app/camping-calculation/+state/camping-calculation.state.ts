@@ -1,6 +1,6 @@
 import { createActionGroup, createFeature, createReducer, on, props } from '@ngrx/store';
-import { CHECK_RESULT } from '../../shared/constants';
-import { CheckDescriptionWithId } from '../../shared/types';
+import { type CHECK_RESULT } from '../../shared/constants';
+import { type CheckDescriptionWithId } from '../../shared/types';
 
 export type CheckDescriptionOptionalDc = Omit<CheckDescriptionWithId, 'dc'> & { dc?: number };
 

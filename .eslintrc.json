@@ -24,6 +24,14 @@
         "@typescript-eslint/explicit-module-boundary-types": "error",
         "linebreak-style": ["error", "unix"],
         "prettier/prettier": "error",
+        "@typescript-eslint/promise-function-async": "off",
+        "accessor-pairs": "off",
+        "@typescript-eslint/consistent-type-imports": [
+          "error",
+          {
+            "fixStyle": "inline-type-imports"
+          }
+        ],
         "unused-imports/no-unused-imports": "error",
         "unused-imports/no-unused-vars": [
           "warn",
@@ -53,7 +61,10 @@
         "plugin:@angular-eslint/template/recommended",
         "plugin:@angular-eslint/template/accessibility"
       ],
-      "rules": {}
+      "rules": {
+        "@angular-eslint/template/click-events-have-key-events": "off",
+        "@angular-eslint/template/interactive-supports-focus": "off"
+      }
     }
   ]
 }

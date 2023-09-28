@@ -19,9 +19,9 @@ function migrateState(state: AppStateVersioned): AppStateVersioned {
 
 @Injectable()
 export class GlobalEffects {
-  private actions$: Actions = inject(Actions);
-  private store: Store = inject(Store);
-  private persistState: boolean = false;
+  private readonly actions$: Actions = inject(Actions);
+  private readonly store: Store = inject(Store);
+  private persistState = false;
 
   activateStatePersistence$ = createEffect(
     () =>
@@ -38,7 +38,9 @@ export class GlobalEffects {
         filter(() => this.persistState),
         debounceTime(500),
         switchMap(() => this.store.pipe(first())),
-        tap((value) => saveStateToLocalStorage(value)),
+        tap((value) => {
+          saveStateToLocalStorage(value);
+        }),
       ),
     { dispatch: false },
   );
@@ -48,7 +50,7 @@ export class GlobalEffects {
       ofType(GlobalActions.loadStoreStateFromLocalStorage),
       map(() => {
         const globalState = loadStateFromLocalStorage();
-        if (globalState) {
+        if (globalState != null) {
           return GlobalActions.loadStoreState({ globalState: migrateState(globalState).state });
         } else {
           return GlobalActions.activateStatePersistence();
@@ -75,6 +77,7 @@ function saveStateToLocalStorage(state: unknown): void {
 
 function loadStateFromLocalStorage(): AppStateVersioned | null {
   const persisted = localStorage.getItem(STATE_STORAGE_KEY);
-  const parsedData: AppStateVersioned | unknown = persisted ? JSON.parse(persisted) : null;
-  return (parsedData as AppStateVersioned)?.version ? (parsedData as AppStateVersioned) : null;
+  const parsedData: AppStateVersioned | unknown =
+    persisted != null && persisted !== '' ? JSON.parse(persisted) : null;
+  return (parsedData as AppStateVersioned)?.version != null ? (parsedData as AppStateVersioned) : null;
 }

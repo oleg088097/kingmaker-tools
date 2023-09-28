@@ -1,42 +1,49 @@
-import { computed, inject, Injectable, Signal } from '@angular/core';
+import { computed, inject, Injectable, type Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
-import { TravelMapModuleState } from '../+state/+module-state';
+import { type TravelMapModuleState } from '../../+state/+module-state';
 import {
   travelMapDisplaySettingsFeature,
-  TravelMapDisplaySettingsState,
-} from '../+state/travel-map-display-settings.state';
-import { travelMapMeshFeature, TravelMapMeshState } from '../+state/travel-map-mesh.state';
-import { MESH_TYPE } from '../interfaces/travel-map-data';
-import { HexMeshAdapterStrategy } from './mesh-adapters/hex-mesh-adapter-strategy';
-import { MeshAdapterStrategy, MeshRender } from './mesh-adapters/mesh-adapter-strategy';
+  type TravelMapDisplaySettingsState,
+} from '../../+state/travel-map-display-settings.state';
+import { travelMapMeshFeature, type TravelMapMeshState } from '../../+state/travel-map-mesh.state';
+import { MESH_TYPE } from '../../interfaces/travel-map-data';
+import { HexMeshAdapterStrategy } from '../mesh-adapters/hex-mesh-adapter-strategy';
+import { type MeshAdapterStrategy, type MeshTileRender } from '../mesh-adapters/mesh-adapter-strategy';
+import { type Renderer } from './renderer';
 
 @Injectable()
-export class MeshService {
-  private store: Store<TravelMapModuleState> = inject(Store);
-  private displaySettings: Signal<TravelMapDisplaySettingsState> = toSignal(
+export class MeshRendererService implements Renderer {
+  private readonly store: Store<TravelMapModuleState> = inject(Store);
+  private readonly displaySettings: Signal<TravelMapDisplaySettingsState> = toSignal(
     this.store.select(travelMapDisplaySettingsFeature.name),
     { requireSync: true },
   );
-  private meshState: Signal<TravelMapMeshState> = toSignal(this.store.select(travelMapMeshFeature.name), {
-    requireSync: true,
-  });
-  private impl: Signal<MeshAdapterStrategy> = computed(() => {
+
+  private readonly meshState: Signal<TravelMapMeshState> = toSignal(
+    this.store.select(travelMapMeshFeature.name),
+    {
+      requireSync: true,
+    },
+  );
+
+  private readonly impl: Signal<MeshAdapterStrategy> = computed(() => {
     switch (this.meshState().meshProperties.type) {
       case MESH_TYPE.HEX:
         return new HexMeshAdapterStrategy();
         break;
       case MESH_TYPE.SQUARE:
-        throw 'not supported';
+        throw new Error('not supported');
         break;
     }
   });
-  private meshRenderMap: Map<string, MeshRender> = new Map();
 
-  public drawMesh(ctx: CanvasRenderingContext2D): void {
+  private readonly meshRenderMap = new Map<string, MeshTileRender>();
+
+  public render(ctx: CanvasRenderingContext2D): void {
     const meshState = this.meshState();
     for (const meshElement of Object.values(meshState.meshMap)) {
-      const meshRender = this.impl().getMeshRender(meshElement.id, meshState);
+      const meshRender = this.impl().getMeshTileRender(meshElement.id, meshState);
       this.meshRenderMap.set(meshElement.id, meshRender);
       this.redrawMeshElement(meshElement.id, ctx);
     }
@@ -52,9 +59,9 @@ export class MeshService {
     return eventElementIds;
   }
 
-  private redrawMeshElement(meshId: string, ctx: CanvasRenderingContext2D) {
+  private redrawMeshElement(meshId: string, ctx: CanvasRenderingContext2D): void {
     const meshRender = this.meshRenderMap.get(meshId);
-    if (meshRender) {
+    if (meshRender != null) {
       ctx.save();
       const meshMapElement = this.meshState().meshMap[meshId];
       ctx.fillStyle =

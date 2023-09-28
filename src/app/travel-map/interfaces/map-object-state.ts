@@ -8,4 +8,6 @@ export interface MapObjectState {
   color: string | null;
   icon: string;
   groups: unknown[];
+  hidden: boolean;
+  inEdit: boolean;
 }

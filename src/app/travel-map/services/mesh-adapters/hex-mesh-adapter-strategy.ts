@@ -1,17 +1,17 @@
-import { TravelMapMeshState } from '../../+state/travel-map-mesh.state';
-import { MeshIdConverter } from '../../utils/mesh-id-converter';
-import { MeshAdapterStrategy, MeshRender } from './mesh-adapter-strategy';
+import { type TravelMapMeshState } from '../../+state/travel-map-mesh.state';
+import { convertMeshIdToCoordinates } from '../../utils/mesh-id-converter';
+import { type MeshAdapterStrategy, type MeshTileRender } from './mesh-adapter-strategy';
 
 export class HexMeshAdapterStrategy implements MeshAdapterStrategy {
-  private angle60: number = (2 * Math.PI) / 6;
-  private angle90: number = Math.PI / 2;
+  private readonly angle60: number = (2 * Math.PI) / 6;
+  private readonly angle90: number = Math.PI / 2;
 
-  public getMeshRender(meshId: string, meshState: TravelMapMeshState): MeshRender {
+  public getMeshTileRender(meshId: string, meshState: TravelMapMeshState): MeshTileRender {
     const r = meshState.meshProperties.size;
-    const coords = MeshIdConverter.convertMeshIdToCoordinates(meshId);
+    const coords = convertMeshIdToCoordinates(meshId);
 
     const meshPath = new Path2D();
-    const xShift = (coords.y % 2 ? -1 : 0) * r * Math.sin(this.angle60);
+    const xShift = (coords.y % 2 === 1 ? -1 : 0) * r * Math.sin(this.angle60);
     const meshHexesOffsetX = r * 2 * Math.sin(this.angle60) * coords.x + xShift;
     const meshHexesOffsetY = (1 + Math.cos(this.angle60)) * r * coords.y;
     const offsetX =
@@ -23,7 +23,7 @@ export class HexMeshAdapterStrategy implements MeshAdapterStrategy {
       const pointY = r * Math.sin(this.angle60 * i + this.angle90);
       meshPath.lineTo(offsetX + pointX, offsetY + pointY);
     }
-    //meshPath.closePath();
+    // meshPath.closePath();
     return {
       path: meshPath,
       center: {

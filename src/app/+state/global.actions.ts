@@ -1,10 +1,11 @@
-import { createActionGroup, emptyProps, props } from '@ngrx/store';
+import { createAction, createActionGroup, emptyProps, props, UPDATE } from '@ngrx/store';
 
 type GlobalState = unknown;
 export interface LoadStoreStatePayload {
   globalState: GlobalState;
 }
 
+export const UPDATE_ACTION_CREATOR = createAction(UPDATE);
 export const GlobalActions = createActionGroup({
   source: 'Global',
   events: {

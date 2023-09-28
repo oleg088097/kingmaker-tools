@@ -5,23 +5,23 @@ import {
   effect,
   inject,
   signal,
-  Signal,
-  WritableSignal,
+  type Signal,
+  type WritableSignal,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { takeUntil } from 'rxjs';
-import { CampingCalculationModuleState } from '../+state/+module-state';
+import { type CampingCalculationModuleState } from '../+state/+module-state';
 import {
   CampingCalculationActions,
   campingCalculationFeature,
-  CampingCalculationState,
-  CampingData,
-  CampingDataCheck,
-  CheckDescriptionOptionalDc,
+  type CampingCalculationState,
+  type CampingData,
+  type CampingDataCheck,
+  type CheckDescriptionOptionalDc,
 } from '../+state/camping-calculation.state';
-import { CheckPerformerService, CheckResult } from '../../shared/services';
+import { CheckPerformerService, type CheckResult } from '../../shared/services';
 import { DestroyService } from '../../utils/destroy.service';
 
 @Component({
@@ -37,6 +37,7 @@ export class CampingCalculationComponent {
     nonNullable: true,
     validators: Validators.required,
   });
+
   protected loading: WritableSignal<boolean> = signal(true);
   protected checksOutdated: WritableSignal<boolean> = signal(false);
   protected displayedColumns: string[] = ['title', 'modifier', 'dc', 'outcome'];
@@ -52,8 +53,9 @@ export class CampingCalculationComponent {
       },
     },
   );
-  private skillCheckPerformerService: CheckPerformerService = inject(CheckPerformerService);
-  private httpClient: HttpClient = inject(HttpClient);
+
+  private readonly skillCheckPerformerService: CheckPerformerService = inject(CheckPerformerService);
+  private readonly httpClient: HttpClient = inject(HttpClient);
 
   constructor() {
     this.httpClient
@@ -70,13 +72,13 @@ export class CampingCalculationComponent {
       this.checksOutdated.set(true);
     });
     effect(() => {
-      let value1 = this.campingCalculationState().commonDc;
+      const value1 = this.campingCalculationState().commonDc;
       this.dcFormControl.setValue(value1, { emitEvent: false });
     });
   }
 
   protected doAllChecks(): void {
-    const checkResultsMap: Map<string, CheckResult> = new Map();
+    const checkResultsMap = new Map<string, CheckResult>();
     for (const check of this.campingCalculationState().checks) {
       checkResultsMap.set(
         check.id,
@@ -91,8 +93,8 @@ export class CampingCalculationComponent {
   }
 
   protected getResultTooltip(id: string): string {
-    let newVar = this.checkResults().get(id);
-    return (newVar ? this.checksInfo().get(id)?.outcomes[newVar.checkResult] : null) ?? '';
+    const newVar = this.checkResults().get(id);
+    return (newVar != null ? this.checksInfo().get(id)?.outcomes[newVar.checkResult] : null) ?? '';
   }
 
   protected onModifierChange(check: CheckDescriptionOptionalDc, event: Event): void {

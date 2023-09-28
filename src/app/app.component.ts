@@ -16,12 +16,10 @@ export class AppComponent {
 
   constructor() {
     this.store.dispatch(GlobalActions.loadStoreStateFromLocalStorage());
-    if (navigator.storage && navigator.storage.persist) {
-      from(navigator.storage.persist())
-        .pipe(takeUntil(this.destroy$))
-        .subscribe((isPersisted) => {
-          console.log(`Persisted storage granted: ${isPersisted}`);
-        });
-    }
+    from(navigator.storage.persist())
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((isPersisted) => {
+        console.log(`Persisted storage granted: ${String(isPersisted)}`);
+      });
   }
 }

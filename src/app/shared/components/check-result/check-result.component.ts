@@ -2,8 +2,8 @@ import { NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';
 import { DestroyService } from '../../../utils/destroy.service';
-import { CHECK_RESULT_INTERPRETATION, CheckResultInterpretation } from '../../constants';
-import { CheckResult } from '../../services';
+import { CHECK_RESULT_INTERPRETATION, type CheckResultInterpretation } from '../../constants';
+import { type CheckResult } from '../../services';
 
 @Component({
   selector: 'app-check-result',
@@ -19,6 +19,6 @@ export class CheckResultComponent {
   @Input() isResultOutdated?: boolean;
 
   protected getInterpretation(): CheckResultInterpretation | null {
-    return this.checkResult ? CHECK_RESULT_INTERPRETATION[this.checkResult.checkResult] : null;
+    return this.checkResult != null ? CHECK_RESULT_INTERPRETATION[this.checkResult.checkResult] : null;
   }
 }

@@ -6,30 +6,27 @@ import {
   Component,
   HostBinding,
   Injector,
-  WritableSignal,
   inject,
   signal,
+  type WritableSignal,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { takeUntil } from 'rxjs';
-import { TravelMapModuleState } from '../+state/+module-state';
+import { type TravelMapModuleState } from '../+state/+module-state';
 import { TravelMapAreasActions } from '../+state/travel-map-area.state';
+import { TravelMapImageActions } from '../+state/travel-map-image.state';
 import { TravelMapMeshActions } from '../+state/travel-map-mesh.state';
 import { TravelMapObjectsActions } from '../+state/travel-map-objects.state';
-
-import { toSignal } from '@angular/core/rxjs-interop';
-import { travelMapDisplaySettingsFeature } from '../+state/travel-map-display-settings.state';
 import { DestroyService } from '../../utils/destroy.service';
-import { OVERLAY_TYPE } from '../constants/overlay-type';
 import {
   CONTEXT_MENU_DATA,
   ContextMenuComponent,
-  ContextMenuData,
   OVERLAY_REF,
+  type ContextMenuData,
 } from '../context-menu/context-menu.component';
-import { TravelMapData } from '../interfaces/travel-map-data';
-import { AreaService } from '../services/area.service';
-import { MeshService } from '../services/mesh.service';
+import { type TravelMapData } from '../interfaces/travel-map-data';
+import { CanvasElementsGetterService } from '../services/canvas-elements-getter.service';
+import { CanvasManagerProviderService } from '../services/canvas-manager-provider.service';
 
 @Component({
   selector: 'app-travel-map',
@@ -39,24 +36,20 @@ import { MeshService } from '../services/mesh.service';
   providers: [DestroyService],
 })
 export class TravelMapComponent {
-  protected loading: WritableSignal<boolean> = signal(true);
-  protected destroy$ = inject(DestroyService);
-  private httpClient: HttpClient = inject(HttpClient);
-  private overlay: Overlay = inject(Overlay);
-  protected store: Store<TravelMapModuleState> = inject(Store);
-  protected travelMapDisplaySettingsState = toSignal(
-    this.store.select(travelMapDisplaySettingsFeature.name),
-    { requireSync: true },
-  );
-  protected meshService = inject(MeshService);
-  protected areaService = inject(AreaService);
+  protected readonly loading: WritableSignal<boolean> = signal(true);
+  protected readonly destroy$ = inject(DestroyService);
+  protected readonly store: Store<TravelMapModuleState> = inject(Store);
+  protected readonly canvasManagerProviderService = inject(CanvasManagerProviderService);
+  protected readonly canvasElementsGetterService = inject(CanvasElementsGetterService);
+  private readonly httpClient: HttpClient = inject(HttpClient);
+  private readonly overlay: Overlay = inject(Overlay);
 
   @HostBinding('style.width.px') protected get width(): number {
-    return 6450 * this.travelMapDisplaySettingsState().scale;
+    return this.canvasManagerProviderService.canvasWidth();
   }
 
   @HostBinding('style.height.px') protected get height(): number {
-    return 2250 * this.travelMapDisplaySettingsState().scale;
+    return this.canvasManagerProviderService.canvasHeight();
   }
 
   constructor() {
@@ -64,6 +57,8 @@ export class TravelMapComponent {
       .get<TravelMapData>('/assets/data/travel-map-elements.json')
       .pipe(takeUntil(this.destroy$))
       .subscribe((data) => {
+        // TODO replace with single action
+        this.store.dispatch(TravelMapImageActions.fromSeed({ data }));
         this.store.dispatch(TravelMapMeshActions.fromSeed({ data }));
         this.store.dispatch(TravelMapAreasActions.fromSeed({ data }));
         this.store.dispatch(TravelMapObjectsActions.fromSeed({ data }));
@@ -71,40 +66,14 @@ export class TravelMapComponent {
       });
   }
 
-  private getMeshElementFromEvent(event: MouseEvent): string | undefined {
-    const elements = document.elementsFromPoint(event.x, event.y);
-    const context: CanvasRenderingContext2D | null = (
-      elements.find(
-        (element) => element.attributes.getNamedItem('data-overlay-type')?.value === OVERLAY_TYPE.MESH,
-      ) as HTMLCanvasElement
-    )?.getContext('2d');
-    if (!context) {
+  protected openContextMenu(event: MouseEvent): void {
+    const meshId = this.canvasElementsGetterService.getMeshElementFromEvent(event);
+    if (meshId === undefined) {
       return;
     }
-    return this.meshService.getCoordsElements(event.offsetX, event.offsetY, context).pop();
-  }
-
-  private getAreaElementsFromEvent(event: MouseEvent): string[] {
-    const elements = document.elementsFromPoint(event.x, event.y);
-    const context: CanvasRenderingContext2D | null = (
-      elements.find(
-        (element) => element.attributes.getNamedItem('data-overlay-type')?.value === OVERLAY_TYPE.AREA,
-      ) as HTMLCanvasElement
-    )?.getContext('2d');
-    if (!context) {
-      return [];
-    }
-    const areaIds = this.areaService.getCoordsElements(event.offsetX, event.offsetY, context);
-    return areaIds;
-  }
-
-  protected openContextMenu(event: MouseEvent) {
-    const meshId = this.getMeshElementFromEvent(event);
-    if (!meshId) {
-      return;
-    }
-    const areaIds = this.getAreaElementsFromEvent(event);
+    const areaIds = this.canvasElementsGetterService.getAreaElementsFromEvent(event);
     event.preventDefault();
+    event.stopPropagation();
     const positionStrategy = this.overlay
       .position()
       .flexibleConnectedTo({
@@ -133,7 +102,7 @@ export class TravelMapComponent {
     });
     const contextMenuData: ContextMenuData = {
       meshId,
-      areaIds: areaIds,
+      areaIds,
       objectIds: [],
     };
     const portal = new ComponentPortal(
@@ -153,6 +122,8 @@ export class TravelMapComponent {
     overlayRef
       .backdropClick()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => overlayRef.dispose());
+      .subscribe(() => {
+        overlayRef.dispose();
+      });
   }
 }

@@ -1,22 +1,24 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
+  effect,
   inject,
-  OnInit,
-  Signal,
   signal,
-  WritableSignal,
+  untracked,
+  type Signal,
+  type WritableSignal,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { isEqual } from 'lodash';
 import { distinctUntilChanged, takeUntil } from 'rxjs';
-import { TravelMapModuleState } from '../+state/+module-state';
+import { type TravelMapModuleState } from '../+state/+module-state';
 import {
   TravelMapDisplaySettingsActions,
   travelMapDisplaySettingsFeature,
-  TravelMapDisplaySettingsState,
+  type TravelMapDisplaySettingsState,
 } from '../+state/travel-map-display-settings.state';
 import { DestroyService } from '../../utils/destroy.service';
 
@@ -25,51 +27,55 @@ import { DestroyService } from '../../utils/destroy.service';
   templateUrl: './map-controls-overlay.component.html',
   styleUrls: ['./map-controls-overlay.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [DestroyService],
 })
-export class MapControlsOverlayComponent implements OnInit {
+export class MapControlsOverlayComponent {
   private static readonly SCALE_STEP = 0.25;
   private static readonly MIN_SCALE = 0.25;
   private static readonly MAX_SCALE = 2;
 
   private readonly destroy$ = inject(DestroyService);
-  protected store: Store<TravelMapModuleState> = inject(Store);
-  protected travelMapDisplaySettingsStateForm = new FormGroup({
+  protected readonly store: Store<TravelMapModuleState> = inject(Store);
+  protected readonly travelMapDisplaySettingsStateForm = new FormGroup({
     isMeshElementTitleDisplayed: new FormControl<boolean>(true, { nonNullable: true }),
     isFogDisplayed: new FormControl<boolean>(true, { nonNullable: true }),
     scale: new FormControl<number>(1, { nonNullable: true }),
   });
 
-  protected isHideDisplayControls: WritableSignal<boolean> = signal(false);
-  protected scale: Signal<number> = toSignal(this.store.select(travelMapDisplaySettingsFeature.selectScale), {
-    requireSync: true,
-  });
+  protected readonly travelMapDisplaySettings: Signal<TravelMapDisplaySettingsState> = toSignal(
+    this.store.select(travelMapDisplaySettingsFeature.name),
+    {
+      requireSync: true,
+    },
+  );
 
+  protected readonly scale: Signal<number> = computed(() => this.travelMapDisplaySettings().scale);
+
+  protected readonly isHideDisplayControls: WritableSignal<boolean> = signal(false);
   public constructor() {
-    this.store
-      .select(travelMapDisplaySettingsFeature.name)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((settings) => {
+    effect(() => {
+      const settings = this.travelMapDisplaySettings();
+      untracked(() => {
         this.travelMapDisplaySettingsStateForm.setValue({
           isFogDisplayed: settings.isFogDisplayed,
           isMeshElementTitleDisplayed: settings.isMeshElementTitleDisplayed,
           scale: settings.scale,
         });
       });
-  }
+    });
 
-  public ngOnInit(): void {
     this.travelMapDisplaySettingsStateForm.valueChanges
       .pipe(
         distinctUntilChanged((lhs, rhs) => isEqual(lhs, rhs)),
         takeUntil(this.destroy$),
       )
-      .subscribe((displaySettings) =>
+      .subscribe((displaySettings) => {
         this.store.dispatch(
           TravelMapDisplaySettingsActions.updateDisplaySettings({
             displaySettings: displaySettings as TravelMapDisplaySettingsState,
           }),
-        ),
-      );
+        );
+      });
   }
 
   protected get scaleControl(): FormControl<number> {
@@ -83,7 +89,7 @@ export class MapControlsOverlayComponent implements OnInit {
   }
 
   protected isScaleMinusDisabled(): boolean {
-    return this.scaleControl.value == MapControlsOverlayComponent.MIN_SCALE;
+    return this.scaleControl.value === MapControlsOverlayComponent.MIN_SCALE;
   }
 
   protected onScalePlus(): void {
@@ -93,6 +99,6 @@ export class MapControlsOverlayComponent implements OnInit {
   }
 
   protected isScalePlusDisabled(): boolean {
-    return this.scaleControl.value == MapControlsOverlayComponent.MAX_SCALE;
+    return this.scaleControl.value === MapControlsOverlayComponent.MAX_SCALE;
   }
 }

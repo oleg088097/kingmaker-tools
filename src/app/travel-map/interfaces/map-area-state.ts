@@ -6,4 +6,6 @@ export interface MapAreaState {
   type: string;
   color: string;
   groups: unknown[];
+  hidden: boolean;
+  inEdit?: boolean;
 }

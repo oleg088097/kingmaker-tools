@@ -7,7 +7,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { ActionReducerMap } from '@ngrx/store/src/models';
+import { type ActionReducerMap } from '@ngrx/store/src/models';
 import { GlobalEffects } from './+state/global.effects';
 import { loadStoreStateMetaReducer } from './+state/load-store-state-meta-reducer';
 import { AppRoutingModule } from './app-routing.module';
@@ -19,7 +19,7 @@ import { AppComponent } from './app.component';
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    StoreModule.forRoot({} as ActionReducerMap<unknown>, {
+    StoreModule.forRoot({} satisfies ActionReducerMap<unknown>, {
       runtimeChecks: {
         strictStateImmutability: true,
         strictActionImmutability: true,
