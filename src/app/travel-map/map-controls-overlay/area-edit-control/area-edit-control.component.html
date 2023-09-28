@@ -17,7 +17,9 @@
       </mat-form-field>
       <span class="area-edit-action-buttons">
         <button mat-raised-button color="accent" (click)="cancel()">Отменить</button>
-        <button mat-raised-button color="primary" (click)="save()">Сохранить</button>
+        <button mat-raised-button color="primary" (click)="save()" [disabled]="isFormNotValid()">
+          Сохранить
+        </button>
       </span>
     </div>
     <div

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, ViewChild, inject, type ElementRef } from '@angular/core';
-import { OVERLAY_TYPE } from '../constants/overlay-type';
-import { CanvasManagerProviderService } from '../services/canvas-manager-provider.service';
-import { AreaRendererService } from '../services/renderers/area-renderer.service';
+import { OVERLAY_TYPE } from '../../constants/overlay-type';
+import { CanvasManagerProviderService } from '../../services/canvas-manager-provider.service';
+import { AreaRendererService } from '../../services/renderers/area-renderer.service';
 
 @Component({
   selector: 'app-map-area-overlay',

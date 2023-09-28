@@ -12,7 +12,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { isEqual } from 'lodash';
-import { distinctUntilChanged, first, map, takeUntil } from 'rxjs';
+import { distinctUntilChanged, first, map, startWith, takeUntil } from 'rxjs';
 import { type TravelMapModuleState } from '../../+state/+module-state';
 import { TravelMapAreasActions, travelMapAreasFeature } from '../../+state/travel-map-area.state';
 import { DestroyService } from '../../../utils/destroy.service';
@@ -55,6 +55,14 @@ export class AreaEditControlComponent {
       validators: [Validators.required],
     }),
   });
+
+  protected readonly isFormNotValid: Signal<boolean> = toSignal(
+    this.areaForm.statusChanges.pipe(
+      startWith(this.areaForm.status),
+      map((status) => status !== 'VALID'),
+    ),
+    { requireSync: true },
+  );
 
   public constructor() {
     effect(() => {

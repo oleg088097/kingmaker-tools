@@ -3,7 +3,7 @@ import { createActionGroup, createFeature, createReducer, on, props } from '@ngr
 export const TravelMapDisplaySettingsActions = createActionGroup({
   source: 'Travel Map Display Settings',
   events: {
-    updateDisplaySettings: props<{ displaySettings: TravelMapDisplaySettingsState }>(),
+    updateDisplaySettings: props<{ displaySettings: Partial<TravelMapDisplaySettingsState> }>(),
   },
 });
 

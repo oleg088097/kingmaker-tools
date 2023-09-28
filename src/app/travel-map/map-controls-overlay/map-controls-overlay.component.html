@@ -1,36 +1,5 @@
 <ng-content />
-<mat-card class="display-control map-control-overlay">
-  <mat-card-content>
-    <div class="controls-wrapper" [class.hide-display-control]="isHideDisplayControls()">
-      <mat-slide-toggle
-        [formControl]="travelMapDisplaySettingsStateForm.controls.isMeshElementTitleDisplayed"
-      >
-        Номера клеток
-      </mat-slide-toggle>
-      <mat-slide-toggle [formControl]="travelMapDisplaySettingsStateForm.controls.isFogDisplayed">
-        Туман
-      </mat-slide-toggle>
-    </div>
 
-    <div
-      class="hide-display-control-button"
-      (click)="isHideDisplayControls.set(true)"
-      *ngIf="!isHideDisplayControls(); else showDisplayControlsButton"
-    >
-      <mat-icon>arrow_back_ios_new</mat-icon>
-    </div>
-    <ng-template #showDisplayControlsButton>
-      <div class="show-display-control-button" (click)="isHideDisplayControls.set(false)">
-        <mat-icon>arrow_forward_ios_new</mat-icon>
-      </div>
-    </ng-template>
-  </mat-card-content>
-</mat-card>
+<app-global-display-control class="global-display-control map-control-overlay"></app-global-display-control>
 <app-area-edit-control class="area-edit-control map-control-overlay"></app-area-edit-control>
-<mat-card class="scale-control map-control-overlay">
-  <mat-card-content>
-    <button mat-raised-button (click)="onScaleMinus()" [disabled]="isScaleMinusDisabled()">-</button>
-    <button mat-raised-button disabled>{{ scale() * 100 }}%</button>
-    <button mat-raised-button (click)="onScalePlus()" [disabled]="isScalePlusDisabled()">+</button>
-  </mat-card-content>
-</mat-card>
+<app-scale-control class="scale-control map-control-overlay"></app-scale-control>

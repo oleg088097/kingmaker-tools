@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, ViewChild, inject, type ElementRef } from '@angular/core';
-import { OVERLAY_TYPE } from '../constants/overlay-type';
-import { CanvasManagerProviderService } from '../services/canvas-manager-provider.service';
-import { MeshRendererService } from '../services/renderers/mesh-renderer.service';
+import { OVERLAY_TYPE } from '../../constants/overlay-type';
+import { CanvasManagerProviderService } from '../../services/canvas-manager-provider.service';
+import { MeshRendererService } from '../../services/renderers/mesh-renderer.service';
 
 @Component({
   selector: 'app-map-mesh-overlay',

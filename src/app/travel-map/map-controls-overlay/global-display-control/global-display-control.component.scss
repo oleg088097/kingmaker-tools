@@ -1,0 +1,35 @@
+.global-display-control {
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+  > mat-card-content {
+    display: flex;
+    padding: 0;
+    > .controls-wrapper {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      &.hide-display-control {
+        width: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+    }
+    > .hide-display-control-button,
+    > .show-display-control-button {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      border-left: solid 1px var(--mat-divider-color);
+    }
+  }
+}
+
+.hide-area-edit-control-button,
+.show-area-edit-control-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-top: solid 1px var(--mat-divider-color);
+}

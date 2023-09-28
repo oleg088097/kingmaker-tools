@@ -25,12 +25,14 @@ import { travelMapImageFeature } from './+state/travel-map-image.state';
 import { travelMapMeshFeature } from './+state/travel-map-mesh.state';
 import { travelMapObjectsFeature } from './+state/travel-map-objects.state';
 import { ContextMenuComponent } from './context-menu/context-menu.component';
-import { MapAreaEditingOverlayComponent } from './map-area-editing-overlay/map-area-editing-overlay.component';
-import { MapAreaOverlayComponent } from './map-area-overlay/map-area-overlay.component';
 import { AreaEditControlComponent } from './map-controls-overlay/area-edit-control/area-edit-control.component';
+import { GlobalDisplayControlComponent } from './map-controls-overlay/global-display-control/global-display-control.component';
 import { MapControlsOverlayComponent } from './map-controls-overlay/map-controls-overlay.component';
-import { MapImageComponent } from './map-image/map-image.component';
-import { MapMeshOverlayComponent } from './map-mesh-overlay/map-mesh-overlay.component';
+import { ScaleControlComponent } from './map-controls-overlay/scale-control/scale-control.component';
+import { MapAreaEditingOverlayComponent } from './map-layers/map-area-editing-overlay/map-area-editing-overlay.component';
+import { MapAreaOverlayComponent } from './map-layers/map-area-overlay/map-area-overlay.component';
+import { MapImageComponent } from './map-layers/map-image/map-image.component';
+import { MapMeshOverlayComponent } from './map-layers/map-mesh-overlay/map-mesh-overlay.component';
 import { CanvasElementsGetterService } from './services/canvas-elements-getter.service';
 import { CanvasManagerProviderService } from './services/canvas-manager-provider.service';
 import { AreaRendererService } from './services/renderers/area-renderer.service';
@@ -48,6 +50,8 @@ import { TravelMapComponent } from './travel-map/travel-map.component';
     ContextMenuComponent,
     MapAreaEditingOverlayComponent,
     AreaEditControlComponent,
+    GlobalDisplayControlComponent,
+    ScaleControlComponent,
   ],
   imports: [
     CommonModule,

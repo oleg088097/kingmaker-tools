@@ -8,13 +8,13 @@ import {
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
-import { type TravelMapModuleState } from '../+state/+module-state';
-import { TravelMapAreasActions, travelMapAreasFeature } from '../+state/travel-map-area.state';
-import { OVERLAY_TYPE } from '../constants/overlay-type';
-import { type MapAreaState } from '../interfaces/map-area-state';
-import { CanvasElementsGetterService } from '../services/canvas-elements-getter.service';
-import { CanvasManagerProviderService } from '../services/canvas-manager-provider.service';
-import { EditAreaRendererService } from '../services/renderers/edit-area-renderer.service';
+import { type TravelMapModuleState } from '../../+state/+module-state';
+import { TravelMapAreasActions, travelMapAreasFeature } from '../../+state/travel-map-area.state';
+import { OVERLAY_TYPE } from '../../constants/overlay-type';
+import { type MapAreaState } from '../../interfaces/map-area-state';
+import { CanvasElementsGetterService } from '../../services/canvas-elements-getter.service';
+import { CanvasManagerProviderService } from '../../services/canvas-manager-provider.service';
+import { EditAreaRendererService } from '../../services/renderers/edit-area-renderer.service';
 
 @Component({
   selector: 'app-map-area-editing-overlay',

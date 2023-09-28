@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, HostBinding, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
-import { type TravelMapModuleState } from '../+state/+module-state';
-import { travelMapImageFeature } from '../+state/travel-map-image.state';
+import { type TravelMapModuleState } from '../../+state/+module-state';
+import { travelMapImageFeature } from '../../+state/travel-map-image.state';
 
 @Component({
   selector: 'app-map-image',
