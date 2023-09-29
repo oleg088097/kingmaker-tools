@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { CHECK_RESULT } from '../constants/check-result';
+import { CHECK_RESULT } from '../constants';
 import { DICE_TYPE, DiceRollerService, DiceRollWithModifierResult } from './dice-roller.service';
 
 export type CheckResult = DiceRollWithModifierResult & { checkResult: CHECK_RESULT };

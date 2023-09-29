@@ -2,9 +2,12 @@ import { createActionGroup, createFeature, createReducer, on, props } from '@ngr
 import { CHECK_RESULT } from '../../shared/constants';
 import { CheckDescriptionWithId } from '../../shared/types';
 
-export type CheckDescriptionOptionalDc = Omit<CheckDescriptionWithId, 'dc'> & { dc?: number };
+export type CheckDescriptionCamping = Omit<CheckDescriptionWithId, 'dc'> & {
+  dc?: number;
+  dependencies?: Record<string, Record<string, number | null>>;
+};
 
-export interface CampingDataCheck extends CheckDescriptionOptionalDc {
+export interface CampingDataCheck extends CheckDescriptionCamping {
   outcomes: {
     [key in CHECK_RESULT]: string;
   };
@@ -20,14 +23,14 @@ export const CampingCalculationActions = createActionGroup({
   source: 'Camping Calculation',
   events: {
     fromData: props<{ data: CampingData }>(),
-    updateCheck: props<{ value: CheckDescriptionOptionalDc }>(),
+    updateCheck: props<{ value: CheckDescriptionCamping }>(),
     updateCommonDc: props<{ value: number }>(),
   },
 });
 
 export interface CampingCalculationState {
   commonDc: number;
-  checks: CheckDescriptionOptionalDc[];
+  checks: CheckDescriptionCamping[];
 }
 
 interface CampingCalculationStateInternal extends CampingCalculationState {
@@ -64,6 +67,7 @@ export const campingCalculationFeature = createFeature({
           const storedState = state.checks.find((storedCheck) => storedCheck.id === updatedCheck.id);
           return {
             id: updatedCheck.id,
+            dependencies: updatedCheck.dependencies,
             title: updatedCheck.title,
             dc: storedState?.dc ?? updatedCheck.dc,
             modifier: storedState?.modifier ?? updatedCheck.modifier,

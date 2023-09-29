@@ -19,7 +19,7 @@ import {
   CampingCalculationState,
   CampingData,
   CampingDataCheck,
-  CheckDescriptionOptionalDc,
+  CheckDescriptionCamping,
 } from '../+state/camping-calculation.state';
 import { CheckPerformerService, CheckResult } from '../../shared/services';
 import { DestroyService } from '../../utils/destroy.service';
@@ -78,13 +78,24 @@ export class CampingCalculationComponent {
   protected doAllChecks(): void {
     const checkResultsMap: Map<string, CheckResult> = new Map();
     for (const check of this.campingCalculationState().checks) {
-      checkResultsMap.set(
-        check.id,
-        this.skillCheckPerformerService.checkSkill(
-          check.modifier,
-          check.dc ?? this.campingCalculationState().commonDc,
-        ),
-      );
+      const dependenciesValues = Object.entries(check.dependencies ?? {})
+        .map(([key, value]) => value[checkResultsMap.get(key)?.checkResult ?? ''])
+        .filter((value) => value !== undefined);
+
+      if (!dependenciesValues.includes(null)) {
+        const dependenciesModifier = (dependenciesValues as number[]).reduce(
+          (acc: number, cur: number) => acc + cur,
+          0,
+        );
+
+        checkResultsMap.set(
+          check.id,
+          this.skillCheckPerformerService.checkSkill(
+            check.modifier + dependenciesModifier,
+            check.dc ?? this.campingCalculationState().commonDc,
+          ),
+        );
+      }
     }
     this.checkResults.set(checkResultsMap);
     this.checksOutdated.set(false);
@@ -95,7 +106,7 @@ export class CampingCalculationComponent {
     return (newVar ? this.checksInfo().get(id)?.outcomes[newVar.checkResult] : null) ?? '';
   }
 
-  protected onModifierChange(check: CheckDescriptionOptionalDc, event: Event): void {
+  protected onModifierChange(check: CheckDescriptionCamping, event: Event): void {
     const modifier = parseInt((event.target as HTMLInputElement).value) ?? 0;
     this.store.dispatch(
       CampingCalculationActions.updateCheck({
@@ -107,7 +118,7 @@ export class CampingCalculationComponent {
     );
   }
 
-  protected onDcChange(check: CheckDescriptionOptionalDc, event: Event): void {
+  protected onDcChange(check: CheckDescriptionCamping, event: Event): void {
     const dc = parseInt((event.target as HTMLInputElement).value) ?? 0;
     this.store.dispatch(
       CampingCalculationActions.updateCheck({
