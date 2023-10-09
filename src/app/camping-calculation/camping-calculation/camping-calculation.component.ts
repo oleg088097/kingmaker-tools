@@ -1,121 +1,80 @@
+import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import { HttpClient } from '@angular/common/http';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  effect,
-  inject,
-  signal,
-  Signal,
-  WritableSignal,
-} from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { FormControl, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, inject, signal, WritableSignal } from '@angular/core';
+import { AbstractControl, FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { takeUntil } from 'rxjs';
 import { CampingCalculationModuleState } from '../+state/+module-state';
-import {
-  CampingCalculationActions,
-  campingCalculationFeature,
-  CampingCalculationState,
-  CampingData,
-  CampingDataCheck,
-  CheckDescriptionOptionalDc,
-} from '../+state/camping-calculation.state';
-import { CheckPerformerService, CheckResult } from '../../shared/services';
+import { CampingChecksActions } from '../+state/camping-checks.state';
+import { RandomEncounterCheckActions } from '../+state/random-encounter-check.state';
+import { WatchChecksActions } from '../+state/watch-checks.state';
 import { DestroyService } from '../../utils/destroy.service';
+import { CampingCalculationData } from '../interfaces/camping-calculation-data';
+import { CampingResultsChange } from './camping-checks/camping-checks.component';
+import { RandomEncounterResultChange } from './random-encounter-check/random-encounter-check.component';
+import { WatchResultChange } from './watch-checks/watch-checks.component';
 
 @Component({
   selector: 'app-camping-calculation',
   templateUrl: './camping-calculation.component.html',
   styleUrls: ['./camping-calculation.component.scss'],
-  providers: [DestroyService],
+  providers: [
+    DestroyService,
+    {
+      provide: STEPPER_GLOBAL_OPTIONS,
+      useValue: { showError: true },
+    },
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CampingCalculationComponent {
   protected destroy$ = inject(DestroyService);
-  protected dcFormControl = new FormControl<number>(0, {
-    nonNullable: true,
-    validators: Validators.required,
-  });
-  protected loading: WritableSignal<boolean> = signal(true);
-  protected checksOutdated: WritableSignal<boolean> = signal(false);
-  protected displayedColumns: string[] = ['title', 'modifier', 'dc', 'outcome'];
+  protected campingCalculationData: WritableSignal<CampingCalculationData | null> = signal(null);
   protected store: Store<CampingCalculationModuleState> = inject(Store);
-  protected checkResults: WritableSignal<Map<string, CheckResult>> = signal(new Map());
-  protected checksInfo: WritableSignal<Map<string, CampingDataCheck>> = signal(new Map());
-  protected campingCalculationState: Signal<CampingCalculationState> = toSignal(
-    this.store.select(campingCalculationFeature.name).pipe(takeUntil(this.destroy$)),
-    {
-      initialValue: {
-        checks: [],
-        commonDc: 20,
-      },
-    },
-  );
-  private skillCheckPerformerService: CheckPerformerService = inject(CheckPerformerService);
   private httpClient: HttpClient = inject(HttpClient);
+
+  protected campingResultControl = new FormControl<CampingResultsChange | null>(null, {
+    validators: [
+      (control: AbstractControl<CampingResultsChange | null>) =>
+        control?.value && control.value.results.size > 0 && !control.value.outdated
+          ? null
+          : { noCampingResult: true },
+    ],
+  });
+  protected randomEncounterResultControl = new FormControl<RandomEncounterResultChange | null>(null, {
+    validators: [
+      (control: AbstractControl<RandomEncounterResultChange | null>) =>
+        control?.value && control.value?.result && !control.value.outdated ? null : { noCampingResult: true },
+    ],
+  });
+  protected watchResultControl = new FormControl<WatchResultChange | null>(null, {
+    validators: [
+      (control: AbstractControl<RandomEncounterResultChange | null>) =>
+        control?.value && control.value?.result && !control.value.outdated ? null : { noCampingResult: true },
+    ],
+  });
 
   constructor() {
     this.httpClient
-      .get<CampingData>('/assets/data/camping-checks.json')
+      .get<CampingCalculationData>('/assets/data/camping-calculation.json')
       .pipe(takeUntil(this.destroy$))
       .subscribe((data) => {
-        this.store.dispatch(CampingCalculationActions.fromData({ data }));
-        this.checksInfo.set(new Map(data.checks.map((checkInfo) => [checkInfo.id, checkInfo])));
-        this.loading.set(false);
+        this.store.dispatch(CampingChecksActions.fromData({ data }));
+        this.store.dispatch(RandomEncounterCheckActions.fromData({ data }));
+        this.store.dispatch(WatchChecksActions.fromData({ data }));
+        this.campingCalculationData.set(data);
       });
-
-    this.dcFormControl.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((value) => {
-      this.store.dispatch(CampingCalculationActions.updateCommonDc({ value: value ?? 0 }));
-      this.checksOutdated.set(true);
-    });
-    effect(() => {
-      let value1 = this.campingCalculationState().commonDc;
-      this.dcFormControl.setValue(value1, { emitEvent: false });
-    });
   }
 
-  protected doAllChecks(): void {
-    const checkResultsMap: Map<string, CheckResult> = new Map();
-    for (const check of this.campingCalculationState().checks) {
-      checkResultsMap.set(
-        check.id,
-        this.skillCheckPerformerService.checkSkill(
-          check.modifier,
-          check.dc ?? this.campingCalculationState().commonDc,
-        ),
-      );
-    }
-    this.checkResults.set(checkResultsMap);
-    this.checksOutdated.set(false);
+  protected onCampingResultChange(change: CampingResultsChange): void {
+    this.campingResultControl.setValue(change);
   }
 
-  protected getResultTooltip(id: string): string {
-    let newVar = this.checkResults().get(id);
-    return (newVar ? this.checksInfo().get(id)?.outcomes[newVar.checkResult] : null) ?? '';
+  protected onRandomEncounterResultChange(change: RandomEncounterResultChange): void {
+    this.randomEncounterResultControl.setValue(change);
   }
 
-  protected onModifierChange(check: CheckDescriptionOptionalDc, event: Event): void {
-    const modifier = parseInt((event.target as HTMLInputElement).value) ?? 0;
-    this.store.dispatch(
-      CampingCalculationActions.updateCheck({
-        value: {
-          ...check,
-          modifier,
-        },
-      }),
-    );
-  }
-
-  protected onDcChange(check: CheckDescriptionOptionalDc, event: Event): void {
-    const dc = parseInt((event.target as HTMLInputElement).value) ?? 0;
-    this.store.dispatch(
-      CampingCalculationActions.updateCheck({
-        value: {
-          ...check,
-          dc,
-        },
-      }),
-    );
+  protected onWatchResultChange(change: WatchResultChange): void {
+    this.watchResultControl.setValue(change);
   }
 }

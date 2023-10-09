@@ -9,11 +9,13 @@
       <span>{{ interpretation.label }}</span>
       <span>
         (
-        <span>{{ checkResult?.rollTotal }}</span>
-        =
         <span>{{ checkResult?.rollRaw }}</span>
         +
         <span>{{ checkResult?.rollModifier }}</span>
+        =
+        <span>{{ checkResult?.rollTotal }}</span>
+        vs.
+        <span>{{ checkResult?.targetDC }}</span>
         )
       </span>
     </span>

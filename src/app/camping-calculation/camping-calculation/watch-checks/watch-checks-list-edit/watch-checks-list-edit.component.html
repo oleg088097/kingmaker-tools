@@ -1,0 +1,20 @@
+<mat-list cdkDropList (cdkDropListDropped)="onOrderChange($event)">
+  <mat-list-item cdkDrag *ngFor="let element of watchChecksStateChecks()">
+    <div class="flex">
+      <mat-icon>drag_handle</mat-icon>
+      <mat-form-field class="small-form-field" subscriptSizing="dynamic">
+        <input
+          matInput
+          placeholder="Имя персонажа"
+          [value]="element.title"
+          (blur)="onTitleChange(element, $event)"
+        />
+      </mat-form-field>
+      <button mat-icon-button color="primary" (click)="onRemoveElement(element)">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  </mat-list-item>
+</mat-list>
+
+<button mat-raised-button color="primary" (click)="onAddElement()">Добавить персонажа</button>
