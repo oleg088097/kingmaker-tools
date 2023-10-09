@@ -1,0 +1,8 @@
+<div class="controls-wrapper">
+  <mat-form-field subscriptSizing="dynamic">
+    <mat-label>DC встречи зоны</mat-label>
+    <input matInput type="number" placeholder="DC" [formControl]="dcFormControl" />
+  </mat-form-field>
+  <button mat-raised-button color="primary" (click)="doFlatCheck()">Провести проверку</button>
+  <app-check-result [isResultOutdated]="checkOutdated()" [checkResult]="checkResult()" />
+</div>

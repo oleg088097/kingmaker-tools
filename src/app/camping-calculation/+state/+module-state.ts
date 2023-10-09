@@ -1,4 +1,9 @@
-import { CampingCalculationState, campingCalculationFeature } from './camping-calculation.state';
+import { CampingChecksState, campingChecksFeature } from './camping-checks.state';
+import { RandomEncounterCheckState, randomEncounterCheckFeature } from './random-encounter-check.state';
+import { WatchChecksState, watchChecksFeature } from './watch-checks.state';
+
 export interface CampingCalculationModuleState {
-  [campingCalculationFeature.name]: CampingCalculationState;
+  [campingChecksFeature.name]: CampingChecksState;
+  [randomEncounterCheckFeature.name]: RandomEncounterCheckState;
+  [watchChecksFeature.name]: WatchChecksState;
 }
