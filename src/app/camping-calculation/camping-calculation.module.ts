@@ -6,6 +6,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -49,6 +50,7 @@ import { WatchChecksComponent } from './camping-calculation/watch-checks/watch-c
     MatListModule,
     CdkDropList,
     CdkDrag,
+    MatCheckboxModule,
   ],
   declarations: [
     CampingCalculationComponent,

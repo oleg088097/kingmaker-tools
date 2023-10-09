@@ -16,7 +16,6 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, Validators } from '@angular/forms';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
-import { MatSelectionListChange } from '@angular/material/list';
 import { Store } from '@ngrx/store';
 import { takeUntil } from 'rxjs';
 import { CampingCalculationModuleState } from '../../+state/+module-state';
@@ -156,14 +155,13 @@ export class WatchChecksComponent {
     );
   }
 
-  protected onSelectionChange(change: MatSelectionListChange): void {
-    const checks = this.watchChecksState().checks.map((check) => ({
-      ...check,
-      disabled: !(change.options.find((selectedCheck) => selectedCheck.value === check.id)?.selected ?? true),
-    }));
+  protected onSelectionChange(check: CampingCalculationDataWatchCheck, checkedState: boolean): void {
     this.store.dispatch(
-      WatchChecksActions.updateChecks({
-        checks,
+      WatchChecksActions.updateCheck({
+        value: {
+          ...check,
+          disabled: !checkedState,
+        },
       }),
     );
   }
