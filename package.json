@@ -26,7 +26,7 @@
     "@ngrx/component": "^16.2.0",
     "@ngrx/effects": "^16.2.0",
     "@ngrx/store": "^16.2.0",
-    "@ngrx/store-devtools": "^16.2.0",
+    "@ngrx/store-devtools": "~16.2.0",
     "@ngx-pwa/local-storage": "^16.3.0",
     "lodash": "^4.17.21",
     "ngx-colors": "^3.5.2",

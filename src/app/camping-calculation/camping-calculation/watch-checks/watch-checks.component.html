@@ -1,0 +1,72 @@
+<div class="controls-wrapper">
+  <mat-form-field subscriptSizing="dynamic">
+    <mat-label>Мод. Скрытности</mat-label>
+    <input matInput type="number" placeholder="Мод. Скрытности" [formControl]="dcFormControl" />
+  </mat-form-field>
+  <button mat-raised-button color="primary" [disabled]="!enabledChecks().length" (click)="doAllChecks()">
+    Провести проверки
+  </button>
+  <button mat-icon-button color="primary" (click)="editMode.set(!editMode())">
+    <mat-icon *ngIf="editMode(); else editIcon">save</mat-icon>
+    <ng-template #editIcon>
+      <mat-icon>edit</mat-icon>
+    </ng-template>
+  </button>
+  <button
+    mat-icon-button
+    *ngIf="checkResult()"
+    color="primary"
+    class="view-result-button"
+    [class.outdated]="checkOutdated()"
+    (click)="openResultBottomSheet()"
+  >
+    <mat-icon>preview</mat-icon>
+  </button>
+</div>
+
+<mat-list *ngIf="!editMode(); else editModeTemplate">
+  <mat-list-item *ngFor="let element of watchChecksState().checks" class="check-list-item">
+    <div class="flex">
+      <mat-checkbox
+        [checked]="!element.disabled"
+        (change)="onSelectionChange(element, $event.checked)"
+      ></mat-checkbox>
+      <span class="title">{{ element.title }}</span>
+      <mat-form-field class="small-form-field" subscriptSizing="dynamic">
+        <input
+          matInput
+          type="number"
+          placeholder="Мод. Внимания"
+          [value]="element.modifier"
+          (change)="onModifierChange(element, $event)"
+        />
+      </mat-form-field>
+      <ng-container *ngIf="checkResult()?.id === element.id">
+        <div class="inline-result">
+          <ng-container *ngTemplateOutlet="resultTemplate"> </ng-container>
+        </div>
+      </ng-container>
+    </div>
+  </mat-list-item>
+</mat-list>
+
+<ng-template #editModeTemplate>
+  <app-watch-checks-list-edit></app-watch-checks-list-edit>
+</ng-template>
+
+<ng-template #resultTemplate>
+  <div class="check-results" *ngIf="checkResult() as checkResult">
+    <div class="check-results-title">{{ getCheckById(checkResult.id).title }}</div>
+    <div class="flex">
+      Внимание:
+      <app-check-result
+        [isResultOutdated]="checkOutdated()"
+        [checkResult]="checkResult.perceptionCheckResult"
+      />
+    </div>
+    <div class="flex">
+      Скрытность:
+      <app-check-result [isResultOutdated]="checkOutdated()" [checkResult]="checkResult.stealthCheckResult" />
+    </div>
+  </div>
+</ng-template>

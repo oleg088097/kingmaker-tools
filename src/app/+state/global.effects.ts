@@ -5,22 +5,27 @@ import { debounceTime, filter, first, map, switchMap, tap } from 'rxjs';
 import { GlobalActions } from './global.actions';
 interface AppStateVersioned {
   version: number;
-  state: unknown;
+  state: Record<string, unknown>;
 }
 
-const CURRENT_STATE_VERSION = 1;
+const CURRENT_STATE_VERSION = 2;
 const STATE_STORAGE_KEY = '__store_state';
 
 // For global migrations
 // specific reducer should use its version field to migrate in GlobalActions.loadStoreState handler
 function migrateState(state: AppStateVersioned): AppStateVersioned {
+  switch (state.version) {
+    case 1: {
+      state.state['campingChecks'] = state.state['campingCalculation'];
+    }
+  }
   return state;
 }
 
 @Injectable()
 export class GlobalEffects {
   private readonly actions$: Actions = inject(Actions);
-  private readonly store: Store = inject(Store);
+  private readonly store: Store<Record<string, unknown>> = inject(Store);
   private persistState = false;
 
   activateStatePersistence$ = createEffect(
@@ -38,7 +43,7 @@ export class GlobalEffects {
         filter(() => this.persistState),
         debounceTime(500),
         switchMap(() => this.store.pipe(first())),
-        tap((value) => {
+        tap((value: Record<string, unknown>) => {
           saveStateToLocalStorage(value);
         }),
       ),
@@ -67,7 +72,7 @@ export class GlobalEffects {
   );
 }
 
-function saveStateToLocalStorage(state: unknown): void {
+function saveStateToLocalStorage(state: Record<string, unknown>): void {
   const appStateSerialized: AppStateVersioned = {
     version: CURRENT_STATE_VERSION,
     state,

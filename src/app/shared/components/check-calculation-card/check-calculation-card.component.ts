@@ -86,7 +86,7 @@ export class CheckCalculationCardComponent {
   }
 
   protected doCheck(): void {
-    const result = this.skillCheckPerformerService.checkSkill(
+    const result = this.skillCheckPerformerService.doCheck(
       this.skillCheckForm.controls.modifier.value,
       this.skillCheckForm.controls.dc.value,
     );

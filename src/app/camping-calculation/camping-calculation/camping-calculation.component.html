@@ -1,71 +1,39 @@
-<mat-card>
-  <mat-progress-spinner *ngIf="loading(); else content" mode="indeterminate" />
-  <ng-template #content>
-    <mat-card-actions class="controls-wrapper">
-      <mat-form-field subscriptSizing="dynamic">
-        <mat-label>DC</mat-label>
-        <input matInput type="number" placeholder="DC" [formControl]="dcFormControl" />
-      </mat-form-field>
-      <button mat-raised-button color="primary" (click)="doAllChecks()">Провести все проверки</button>
-    </mat-card-actions>
-    <table mat-table [dataSource]="campingCalculationState().checks" class="mat-elevation-z8">
-      <ng-container matColumnDef="title">
-        <th mat-header-cell *matHeaderCellDef>Проверка</th>
-        <td mat-cell *matCellDef="let element">{{ element.title }}</td>
-      </ng-container>
-      <ng-container matColumnDef="modifier">
-        <th mat-header-cell *matHeaderCellDef>Мод</th>
-        <td mat-cell *matCellDef="let element">
-          <mat-form-field class="small-form-field" subscriptSizing="dynamic">
-            <input
-              matInput
-              type="number"
-              placeholder="Мод"
-              [value]="element.modifier"
-              (change)="onModifierChange(element, $event)"
-            />
-          </mat-form-field>
-        </td>
-      </ng-container>
-      <ng-container matColumnDef="dc">
-        <th mat-header-cell *matHeaderCellDef>DC</th>
-        <td mat-cell *matCellDef="let element">
-          <mat-form-field
-            class="small-form-field"
-            *ngIf="element.dc !== undefined; else commonDc"
-            subscriptSizing="dynamic"
-          >
-            <input
-              matInput
-              type="number"
-              placeholder="DC"
-              [value]="element.dc"
-              (change)="onDcChange(element, $event)"
-            />
-          </mat-form-field>
-          <ng-template #commonDc>{{ campingCalculationState().commonDc }}</ng-template>
-        </td>
-      </ng-container>
-      <ng-container matColumnDef="outcome">
-        <th mat-header-cell *matHeaderCellDef>Результат</th>
-        <td
-          mat-cell
-          *matCellDef="let element"
-          matTooltipPosition="left"
-          [matTooltip]="getResultTooltip(element.id)"
-        >
-          <app-check-result
-            [isResultOutdated]="checksOutdated()"
-            [checkResult]="checkResults().get(element.id)"
-          />
-          <div class="check-outcome-extended-description" [class.outdated]="checksOutdated()">
-            {{ getResultTooltip(element.id) }}
-          </div>
-        </td>
-      </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-    </table>
+<mat-card class="square-100">
+  <mat-spinner *ngIf="campingCalculationData() === null; else campingStepper"></mat-spinner>
+  <ng-template #campingStepper>
+    <mat-stepper orientation="horizontal">
+      <mat-step [stepControl]="campingResultControl">
+        <ng-template matStepLabel>Лагерь</ng-template>
+        <app-camping-checks
+          [campingCalculationData]="campingCalculationData()"
+          (resultsChange)="onCampingResultChange($event)"
+        ></app-camping-checks>
+        <div class="step-controls">
+          <button mat-button matStepperPrevious>Назад</button>
+          <button mat-button matStepperNext mat-raised-button color="primary">Вперёд</button>
+        </div>
+      </mat-step>
+      <mat-step [stepControl]="randomEncounterResultControl">
+        <ng-template matStepLabel>Столкновение</ng-template>
+        <app-random-encounter-check
+          [campingResults]="campingResultControl.valueChanges | async"
+          (resultsChange)="onRandomEncounterResultChange($event)"
+        ></app-random-encounter-check>
+        <div class="step-controls">
+          <button mat-button matStepperPrevious>Назад</button>
+          <button mat-button matStepperNext mat-raised-button color="primary">Вперёд</button>
+        </div>
+      </mat-step>
+      <mat-step [stepControl]="watchResultControl">
+        <ng-template matStepLabel>Дозор</ng-template>
+        <app-watch-checks (resultsChange)="onWatchResultChange($event)"></app-watch-checks>
+        <div class="step-controls">
+          <button mat-button matStepperPrevious>Назад</button>
+        </div>
+      </mat-step>
+      <ng-template matStepperIcon="edit">
+        <mat-icon>check</mat-icon>
+      </ng-template>
+    </mat-stepper>
   </ng-template>
 </mat-card>

@@ -1,0 +1,18 @@
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+.controls-wrapper {
+  width: 100%;
+  justify-content: flex-start;
+  align-items: center;
+  display: flex;
+  row-gap: 1em;
+  gap: 1em;
+  flex-wrap: wrap;
+
+  @media (min-width: 500px) {
+    flex-wrap: nowrap;
+  }
+}
