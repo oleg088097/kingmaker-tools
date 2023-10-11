@@ -1,8 +1,3 @@
-import {
-  MAT_COLOR_FORMATS,
-  NGX_MAT_COLOR_FORMATS,
-  NgxMatColorPickerModule,
-} from '@angular-material-components/color-picker';
 import { CdkMenuModule } from '@angular/cdk/menu';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
@@ -77,7 +72,6 @@ import { TravelMapComponent } from './travel-map/travel-map.component';
     MatProgressSpinnerModule,
     MatListModule,
     MatInputModule,
-    NgxMatColorPickerModule,
     NgxColorsModule,
   ],
   providers: [
@@ -86,7 +80,6 @@ import { TravelMapComponent } from './travel-map/travel-map.component';
     EditAreaRendererService,
     CanvasManagerProviderService,
     CanvasElementsGetterService,
-    { provide: MAT_COLOR_FORMATS, useValue: NGX_MAT_COLOR_FORMATS },
   ],
 })
 export class TravelMapModule {}
