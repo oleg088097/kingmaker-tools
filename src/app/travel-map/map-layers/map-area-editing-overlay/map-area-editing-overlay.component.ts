@@ -18,6 +18,8 @@ import { CanvasElementsGetterService } from '../../services/canvas-elements-gett
 import { CanvasManagerProviderService } from '../../services/canvas-manager-provider.service';
 import { EditAreaRendererService } from '../../services/renderers/edit-area-renderer.service';
 
+// TODO add initial borders highlight for editing area
+
 @Component({
   selector: 'app-map-area-editing-overlay',
   templateUrl: './map-area-editing-overlay.component.html',

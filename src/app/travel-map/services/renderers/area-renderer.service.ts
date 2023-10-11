@@ -50,7 +50,7 @@ export class AreaRendererService implements Renderer {
       if (area.hidden || area.inEdit === true) {
         continue;
       }
-      const areaPath: Path2D = area.meshElementIds
+      const areaPath: Path2D = (area.meshElementIds ?? [])
         .map((id) => this.impl().getMeshTileRender(id, meshState))
         .reduce((acc, elem) => {
           acc.addPath(elem.path);
