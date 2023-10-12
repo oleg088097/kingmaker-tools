@@ -18,6 +18,7 @@ import { TravelMapImageActions } from '../+state/travel-map-image.state';
 import { TravelMapMeshActions } from '../+state/travel-map-mesh.state';
 import { TravelMapObjectsActions } from '../+state/travel-map-objects.state';
 import { DestroyService } from '../../utils/destroy.service';
+import { OVERLAY_TYPE } from '../constants/overlay-type';
 import {
   CONTEXT_MENU_DATA,
   ContextMenuComponent,
@@ -36,11 +37,12 @@ import { CanvasManagerProviderService } from '../services/canvas-manager-provide
   providers: [DestroyService],
 })
 export class TravelMapComponent {
-  protected readonly loading: WritableSignal<boolean> = signal(true);
   protected readonly destroy$ = inject(DestroyService);
   protected readonly store: Store<TravelMapModuleState> = inject(Store);
   protected readonly canvasManagerProviderService = inject(CanvasManagerProviderService);
   protected readonly canvasElementsGetterService = inject(CanvasElementsGetterService);
+  protected readonly OVERLAY_TYPE = OVERLAY_TYPE;
+  protected readonly loading: WritableSignal<boolean> = signal(true);
   private readonly httpClient: HttpClient = inject(HttpClient);
   private readonly overlay: Overlay = inject(Overlay);
 

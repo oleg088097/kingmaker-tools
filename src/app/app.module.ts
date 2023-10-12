@@ -1,3 +1,4 @@
+import { HttpClientModule } from '@angular/common/http';
 import { NgModule, isDevMode } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -17,6 +18,8 @@ import { AppComponent } from './app.component';
   declarations: [AppComponent],
   imports: [
     BrowserModule,
+    // Needed in root for MatIconRegistry
+    HttpClientModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     StoreModule.forRoot({} satisfies ActionReducerMap<unknown>, {

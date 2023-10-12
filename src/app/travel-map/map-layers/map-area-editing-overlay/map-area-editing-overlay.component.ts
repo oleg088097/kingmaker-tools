@@ -16,7 +16,7 @@ import { OVERLAY_TYPE } from '../../constants/overlay-type';
 import { type MapAreaState } from '../../interfaces/map-area-state';
 import { CanvasElementsGetterService } from '../../services/canvas-elements-getter.service';
 import { CanvasManagerProviderService } from '../../services/canvas-manager-provider.service';
-import { EditAreaRendererService } from '../../services/renderers/edit-area-renderer.service';
+import { RendererProviderService } from '../../services/renderer-provider.service';
 
 // TODO add initial borders highlight for editing area
 
@@ -42,10 +42,9 @@ export class MapAreaEditingOverlayComponent {
 
   protected readonly overlayType = OVERLAY_TYPE.AREA_EDIT;
   private readonly destroy$ = inject(DestroyService);
-  protected readonly editAreaService = inject(EditAreaRendererService);
-  protected readonly canvasManager = inject(CanvasManagerProviderService).provideCanvasManager(
-    this.editAreaService,
-  );
+  protected readonly canvasManager = inject(CanvasManagerProviderService)
+    .provideCanvasManager()
+    .setRenderer(inject(RendererProviderService).getRendererByOverlayType(this.overlayType));
 
   protected readonly canvasElementsGetterService = inject(CanvasElementsGetterService);
   private readonly store: Store<TravelMapModuleState> = inject(Store);

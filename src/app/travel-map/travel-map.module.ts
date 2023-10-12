@@ -25,14 +25,16 @@ import { GlobalDisplayControlComponent } from './map-controls-overlay/global-dis
 import { MapControlsOverlayComponent } from './map-controls-overlay/map-controls-overlay.component';
 import { ScaleControlComponent } from './map-controls-overlay/scale-control/scale-control.component';
 import { MapAreaEditingOverlayComponent } from './map-layers/map-area-editing-overlay/map-area-editing-overlay.component';
-import { MapAreaOverlayComponent } from './map-layers/map-area-overlay/map-area-overlay.component';
 import { MapImageComponent } from './map-layers/map-image/map-image.component';
-import { MapMeshOverlayComponent } from './map-layers/map-mesh-overlay/map-mesh-overlay.component';
+import { MapSimpleOverlayComponent } from './map-layers/map-simple-overlay/map-simple-overlay.component';
 import { CanvasElementsGetterService } from './services/canvas-elements-getter.service';
 import { CanvasManagerProviderService } from './services/canvas-manager-provider.service';
+import { MapIconRegistryService } from './services/map-icon-registry.service';
+import { RendererProviderService } from './services/renderer-provider.service';
+import { AreaEditRendererService } from './services/renderers/area-edit-renderer.service';
 import { AreaRendererService } from './services/renderers/area-renderer.service';
-import { EditAreaRendererService } from './services/renderers/edit-area-renderer.service';
 import { MeshRendererService } from './services/renderers/mesh-renderer.service';
+import { ObjectRendererService } from './services/renderers/object-renderer.service';
 import { TravelMapComponent } from './travel-map/travel-map.component';
 
 @NgModule({
@@ -40,13 +42,12 @@ import { TravelMapComponent } from './travel-map/travel-map.component';
     MapImageComponent,
     MapControlsOverlayComponent,
     TravelMapComponent,
-    MapMeshOverlayComponent,
-    MapAreaOverlayComponent,
     ContextMenuComponent,
     MapAreaEditingOverlayComponent,
     AreaEditControlComponent,
     GlobalDisplayControlComponent,
     ScaleControlComponent,
+    MapSimpleOverlayComponent,
   ],
   imports: [
     CommonModule,
@@ -75,11 +76,14 @@ import { TravelMapComponent } from './travel-map/travel-map.component';
     NgxColorsModule,
   ],
   providers: [
+    MapIconRegistryService,
     MeshRendererService,
     AreaRendererService,
-    EditAreaRendererService,
+    AreaEditRendererService,
+    ObjectRendererService,
     CanvasManagerProviderService,
     CanvasElementsGetterService,
+    RendererProviderService,
   ],
 })
 export class TravelMapModule {}

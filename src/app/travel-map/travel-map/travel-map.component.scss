@@ -9,3 +9,15 @@
   width: fit-content;
   height: fit-content;
 }
+
+.mesh-overlay {
+  --simple-overlay-z-index: var(--kt-mesh-overlay-z-index);
+}
+
+.area-overlay {
+  --simple-overlay-z-index: var(--kt-area-overlay-z-index);
+}
+
+.object-overlay {
+  --simple-overlay-z-index: var(--kt-object-overlay-z-index);
+}

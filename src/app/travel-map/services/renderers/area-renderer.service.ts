@@ -71,11 +71,11 @@ export class AreaRendererService implements Renderer {
     return eventElementIds;
   }
 
-  private redrawArea(meshId: string, ctx: CanvasRenderingContext2D): void {
-    const path = this.areaRenderMap.get(meshId);
+  private redrawArea(areaId: string, ctx: CanvasRenderingContext2D): void {
+    const path = this.areaRenderMap.get(areaId);
     if (path != null) {
       ctx.save();
-      const area = this.areasState()[meshId];
+      const area = this.areasState()[areaId];
       ctx.globalAlpha = 0.5;
       ctx.fillStyle = area.color;
       ctx.fill(path);

@@ -1,13 +1,18 @@
+export enum ICON_TYPE {
+  building = 'building',
+  creature = 'creature',
+}
+
 export interface MapObjectState {
   id: string;
   title: string;
   meshElementId: string;
-  meshElementRelativeX: number;
-  meshElementRelativeY: number;
-  type: string;
-  color: string | null;
+  meshElementCenterRelativeX: number;
+  meshElementCenterRelativeY: number;
+  type: ICON_TYPE;
+  color: string;
   icon: string;
   groups: unknown[];
   hidden: boolean;
-  inEdit: boolean;
+  inEdit?: boolean;
 }

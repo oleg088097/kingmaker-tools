@@ -11,7 +11,7 @@ import { type MeshAdapterStrategy, type MeshTileRender } from '../mesh-adapters/
 import { type Renderer } from './renderer';
 
 @Injectable()
-export class EditAreaRendererService implements Renderer {
+export class AreaEditRendererService implements Renderer {
   private readonly store: Store<TravelMapModuleState> = inject(Store);
   private readonly plusMinusLineWidth = 15;
   private readonly meshState: Signal<TravelMapMeshState> = toSignal(

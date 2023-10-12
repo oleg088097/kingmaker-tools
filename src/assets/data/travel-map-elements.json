@@ -1,6 +1,17 @@
 {
   "version": 1,
-  "objects": {},
+  "objects": {
+    "olegTradingPost": {
+      "id": "olegTradingPost",
+      "color": "#000000",
+      "hidden": false,
+      "icon": "img-castle",
+      "type": "building",
+      "meshElementId": "A19",
+      "meshElementCenterRelativeX": -30,
+      "meshElementCenterRelativeY": -130
+    }
+  },
   "areas": {
     "greenBelt": {
       "id": "greenBelt",
