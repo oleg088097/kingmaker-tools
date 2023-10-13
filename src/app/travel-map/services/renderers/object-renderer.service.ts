@@ -14,7 +14,7 @@ import { type Renderer } from './renderer';
 
 @Injectable()
 export class ObjectRendererService implements Renderer, OnDestroy {
-  private readonly destroy$ = new Subject<boolean>();
+  private readonly destroy$ = new Subject<void>();
   private readonly store: Store<TravelMapModuleState> = inject(Store);
   private readonly iconRegistry: MapIconRegistryService = inject(MapIconRegistryService);
   private readonly meshState: Signal<TravelMapMeshState> = toSignal(
@@ -25,7 +25,7 @@ export class ObjectRendererService implements Renderer, OnDestroy {
   );
 
   public ngOnDestroy(): void {
-    this.destroy$.next(true);
+    this.destroy$.next();
   }
 
   private readonly objectsState: Signal<Record<string, MapObjectState>> = toSignal(

@@ -16,8 +16,8 @@ export class MapIconRegistryService {
   };
 
   private readonly registries: Record<ICON_TYPE, null | Observable<Record<string, string>>> = {
-    [ICON_TYPE.building]: this.getIconSet(this.registrySourcePaths.building),
-    [ICON_TYPE.creature]: this.getIconSet(this.registrySourcePaths.creature),
+    [ICON_TYPE.building]: this.lazyLoadIconSet(this.registrySourcePaths.building),
+    [ICON_TYPE.creature]: this.lazyLoadIconSet(this.registrySourcePaths.creature),
   };
 
   private readonly unknownIcon: string =
@@ -33,7 +33,7 @@ export class MapIconRegistryService {
     );
   }
 
-  private getIconSet(address: string): Observable<Record<string, string>> {
+  private lazyLoadIconSet(address: string): Observable<Record<string, string>> {
     return this.httpClient.get(address, { responseType: 'text' }).pipe(
       map((response) => this.parseIconSet(response)),
       shareReplay({ refCount: true, bufferSize: 1 }),

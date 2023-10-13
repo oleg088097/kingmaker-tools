@@ -16,17 +16,22 @@ export class MapSimpleOverlayComponent {
   @ViewChild('canvasElement', { static: true }) public set canvasElement(
     canvasElement: ElementRef<HTMLCanvasElement>,
   ) {
-    this.canvasManager.setCanvasContext(canvasElement.nativeElement.getContext('2d'));
+    this._canvasManager.setCanvas(canvasElement.nativeElement);
   }
 
   @Input({ required: true }) public set overlayType(overlayType: OVERLAY_TYPE) {
-    // TODO no way to destroy canvas manager. Add?
     this._overlayType = overlayType;
     const renderer = this.rendererProviderService.getRendererByOverlayType(overlayType);
-    this.canvasManager.setRenderer(renderer);
+    this._canvasManager.setRenderer(renderer);
   }
 
   protected _overlayType!: OVERLAY_TYPE;
   private readonly rendererProviderService: RendererProviderService = inject(RendererProviderService);
-  private readonly canvasManager: CanvasManager = inject(CanvasManagerProviderService).provideCanvasManager();
+  private readonly _canvasManager: CanvasManager = inject(
+    CanvasManagerProviderService,
+  ).provideCanvasManager();
+
+  public get canvasManager(): CanvasManager {
+    return this._canvasManager;
+  }
 }

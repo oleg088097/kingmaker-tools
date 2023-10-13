@@ -24,11 +24,12 @@ import { AreaEditControlComponent } from './map-controls-overlay/area-edit-contr
 import { GlobalDisplayControlComponent } from './map-controls-overlay/global-display-control/global-display-control.component';
 import { MapControlsOverlayComponent } from './map-controls-overlay/map-controls-overlay.component';
 import { ScaleControlComponent } from './map-controls-overlay/scale-control/scale-control.component';
-import { MapAreaEditingOverlayComponent } from './map-layers/map-area-editing-overlay/map-area-editing-overlay.component';
+import { MapAreaEditingOverlayDirective } from './map-layers/map-area-editing-overlay/map-area-editing-overlay.component';
 import { MapImageComponent } from './map-layers/map-image/map-image.component';
 import { MapSimpleOverlayComponent } from './map-layers/map-simple-overlay/map-simple-overlay.component';
 import { CanvasElementsGetterService } from './services/canvas-elements-getter.service';
 import { CanvasManagerProviderService } from './services/canvas-manager-provider.service';
+import { AreaEditorPluginService } from './services/editors/area-editor-plugin.service';
 import { MapIconRegistryService } from './services/map-icon-registry.service';
 import { RendererProviderService } from './services/renderer-provider.service';
 import { AreaEditRendererService } from './services/renderers/area-edit-renderer.service';
@@ -43,11 +44,11 @@ import { TravelMapComponent } from './travel-map/travel-map.component';
     MapControlsOverlayComponent,
     TravelMapComponent,
     ContextMenuComponent,
-    MapAreaEditingOverlayComponent,
     AreaEditControlComponent,
     GlobalDisplayControlComponent,
     ScaleControlComponent,
     MapSimpleOverlayComponent,
+    MapAreaEditingOverlayDirective,
   ],
   imports: [
     CommonModule,
@@ -76,6 +77,7 @@ import { TravelMapComponent } from './travel-map/travel-map.component';
     NgxColorsModule,
   ],
   providers: [
+    AreaEditorPluginService,
     MapIconRegistryService,
     MeshRendererService,
     AreaRendererService,

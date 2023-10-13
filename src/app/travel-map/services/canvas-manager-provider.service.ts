@@ -6,9 +6,15 @@ import { travelMapDisplaySettingsFeature } from '../+state/travel-map-display-se
 import { travelMapImageFeature } from '../+state/travel-map-image.state';
 import { type Renderer } from './renderers/renderer';
 
+export interface CanvasManagerPlugin {
+  attach: (canvasElement: HTMLCanvasElement | null) => void;
+  detach: () => void;
+}
+
 export interface CanvasManager {
-  setCanvasContext: (ctx: CanvasRenderingContext2D | null) => CanvasManager;
+  setCanvas: (ctx: HTMLCanvasElement | null) => CanvasManager;
   setRenderer: (ctx: Renderer | null) => CanvasManager;
+  addPlugin: (ctx: CanvasManagerPlugin | null) => CanvasManager;
 }
 
 @Injectable()
@@ -30,11 +36,12 @@ export class CanvasManagerProviderService {
     const canvasWidth = this.canvasWidth;
     const canvasHeight = this.canvasHeight;
     return new (class implements CanvasManager {
-      private readonly ctx: WritableSignal<CanvasRenderingContext2D | null> = signal(null);
+      private readonly canvas: WritableSignal<HTMLCanvasElement | null> = signal(null);
       private readonly rerender: WritableSignal<Renderer | null> = signal(null);
+      private readonly plugins: CanvasManagerPlugin[] = [];
 
-      public setCanvasContext(ctx: CanvasRenderingContext2D | null): CanvasManager {
-        this.ctx.set(ctx);
+      public setCanvas(ctx: HTMLCanvasElement | null): CanvasManager {
+        this.canvas.set(ctx);
         return this;
       }
 
@@ -43,9 +50,18 @@ export class CanvasManagerProviderService {
         return this;
       }
 
+      public addPlugin(plugin: CanvasManagerPlugin | null): CanvasManager {
+        if (plugin !== null) {
+          plugin.attach(this.canvas());
+          this.plugins.push(plugin);
+        }
+        return this;
+      }
+
       constructor() {
         effect(() => {
-          const ctx = this.ctx();
+          const canvas = this.canvas();
+          const ctx = canvas?.getContext('2d');
           const rerender = this.rerender();
           if (ctx != null && rerender != null) {
             ctx.canvas.width = canvasWidth();
@@ -53,6 +69,13 @@ export class CanvasManagerProviderService {
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
             ctx.scale(scale(), scale());
             rerender?.render(ctx);
+          }
+        });
+        effect(() => {
+          const canvas = this.canvas();
+          for (const plugin of this.plugins) {
+            plugin.detach();
+            plugin.attach(canvas);
           }
         });
       }
