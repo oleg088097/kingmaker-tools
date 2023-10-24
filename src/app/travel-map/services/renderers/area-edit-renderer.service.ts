@@ -1,18 +1,19 @@
-import { computed, inject, Injectable, type Signal } from '@angular/core';
+import { inject, Injectable, type Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { type TravelMapModuleState } from '../../+state/+module-state';
 import { travelMapAreasFeature } from '../../+state/travel-map-area.state';
 import { travelMapMeshFeature, type TravelMapMeshState } from '../../+state/travel-map-mesh.state';
+import { DEFAULT_AREA_FILL_COLOR } from '../../constants/default-color';
 import { type MapAreaState } from '../../interfaces/map-area-state';
-import { MESH_TYPE } from '../../interfaces/travel-map-data';
-import { HexMeshAdapterStrategy } from '../mesh-adapters/hex-mesh-adapter-strategy';
-import { type MeshAdapterStrategy, type MeshTileRender } from '../mesh-adapters/mesh-adapter-strategy';
+import { type MeshTileRender } from '../mesh-adapters/mesh-adapter-strategy';
+import { MeshRendererService } from './mesh-renderer.service';
 import { type Renderer } from './renderer';
 
 @Injectable()
 export class AreaEditRendererService implements Renderer {
-  private readonly store: Store<TravelMapModuleState> = inject(Store);
+  private readonly meshService: MeshRendererService = inject(MeshRendererService);
+  private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   private readonly plusMinusLineWidth = 15;
   private readonly meshState: Signal<TravelMapMeshState> = toSignal(
     this.store.select(travelMapMeshFeature.name),
@@ -27,17 +28,6 @@ export class AreaEditRendererService implements Renderer {
       requireSync: true,
     },
   );
-
-  private readonly impl: Signal<MeshAdapterStrategy> = computed(() => {
-    switch (this.meshState().meshProperties.type) {
-      case MESH_TYPE.HEX:
-        return new HexMeshAdapterStrategy();
-        break;
-      case MESH_TYPE.SQUARE:
-        throw new Error('not supported');
-        break;
-    }
-  });
 
   private editAreaRender: {
     path: Path2D;
@@ -55,7 +45,7 @@ export class AreaEditRendererService implements Renderer {
 
     const areaMeshTiles: MeshTileRender[] = [];
     for (const meshElement of Object.values(meshState.meshMap)) {
-      const meshRender = this.impl().getMeshTileRender(meshElement.id, meshState);
+      const meshRender = this.meshService.getMeshTileRender(meshElement.id) as MeshTileRender;
       if (editAreaState.meshElementIds?.includes(meshElement.id) === true) {
         areaMeshTiles.push(meshRender);
       } else {
@@ -91,7 +81,7 @@ export class AreaEditRendererService implements Renderer {
     if (this.editAreaRender != null) {
       ctx.save();
       ctx.globalAlpha = 0.5;
-      ctx.fillStyle = area?.color ?? 'red';
+      ctx.fillStyle = area?.color ?? DEFAULT_AREA_FILL_COLOR;
       ctx.fill(this.editAreaRender.path);
 
       ctx.lineWidth = 3;

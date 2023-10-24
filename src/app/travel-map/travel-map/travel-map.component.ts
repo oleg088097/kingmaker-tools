@@ -38,7 +38,7 @@ import { CanvasManagerProviderService } from '../services/canvas-manager-provide
 })
 export class TravelMapComponent {
   protected readonly destroy$ = inject(DestroyService);
-  protected readonly store: Store<TravelMapModuleState> = inject(Store);
+  protected readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   protected readonly canvasManagerProviderService = inject(CanvasManagerProviderService);
   protected readonly canvasElementsGetterService = inject(CanvasElementsGetterService);
   protected readonly OVERLAY_TYPE = OVERLAY_TYPE;
@@ -74,6 +74,7 @@ export class TravelMapComponent {
       return;
     }
     const areaIds = this.canvasElementsGetterService.getAreaElementsFromEvent(event);
+    const objectIds = this.canvasElementsGetterService.getObjectElementsFromEvent(event);
     event.preventDefault();
     event.stopPropagation();
     const positionStrategy = this.overlay
@@ -105,7 +106,8 @@ export class TravelMapComponent {
     const contextMenuData: ContextMenuData = {
       meshId,
       areaIds,
-      objectIds: [],
+      objectIds,
+      event,
     };
     const portal = new ComponentPortal(
       ContextMenuComponent,

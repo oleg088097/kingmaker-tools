@@ -19,7 +19,7 @@ export interface CanvasManager {
 
 @Injectable()
 export class CanvasManagerProviderService {
-  private readonly store: Store<TravelMapModuleState> = inject(Store);
+  private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   protected readonly scale = toSignal(this.store.select(travelMapDisplaySettingsFeature.selectScale), {
     requireSync: true,
   });

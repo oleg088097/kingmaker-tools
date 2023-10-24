@@ -27,7 +27,7 @@ import { type MapAreaState } from '../../interfaces/map-area-state';
   providers: [DestroyService],
 })
 export class AreaEditControlComponent {
-  private readonly store: Store<TravelMapModuleState> = inject(Store);
+  private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   private readonly destroy$ = inject(DestroyService);
   protected readonly isHideDisplayControls: WritableSignal<boolean> = signal(false);
   /*

@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, type OnDestroy, type Signal } from '@angular/core';
+import { inject, Injectable, type OnDestroy, type Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { Subject, takeUntil } from 'rxjs';
@@ -6,16 +6,16 @@ import { type TravelMapModuleState } from '../../+state/+module-state';
 import { travelMapMeshFeature, type TravelMapMeshState } from '../../+state/travel-map-mesh.state';
 import { travelMapObjectsFeature } from '../../+state/travel-map-objects.state';
 import { type MapObjectState } from '../../interfaces/map-object-state';
-import { MESH_TYPE } from '../../interfaces/travel-map-data';
 import { MapIconRegistryService } from '../map-icon-registry.service';
-import { HexMeshAdapterStrategy } from '../mesh-adapters/hex-mesh-adapter-strategy';
-import { type MeshAdapterStrategy, type MeshTileRender } from '../mesh-adapters/mesh-adapter-strategy';
+import { type MeshTileRender } from '../mesh-adapters/mesh-adapter-strategy';
+import { MeshRendererService } from './mesh-renderer.service';
 import { type Renderer } from './renderer';
 
 @Injectable()
 export class ObjectRendererService implements Renderer, OnDestroy {
   private readonly destroy$ = new Subject<void>();
-  private readonly store: Store<TravelMapModuleState> = inject(Store);
+  private readonly meshService: MeshRendererService = inject(MeshRendererService);
+  private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   private readonly iconRegistry: MapIconRegistryService = inject(MapIconRegistryService);
   private readonly meshState: Signal<TravelMapMeshState> = toSignal(
     this.store.select(travelMapMeshFeature.name),
@@ -35,17 +35,6 @@ export class ObjectRendererService implements Renderer, OnDestroy {
     },
   );
 
-  private readonly impl: Signal<MeshAdapterStrategy> = computed(() => {
-    switch (this.meshState().meshProperties.type) {
-      case MESH_TYPE.HEX:
-        return new HexMeshAdapterStrategy();
-      case MESH_TYPE.SQUARE:
-        throw new Error('not supported');
-      default:
-        throw new Error('not supported');
-    }
-  });
-
   private readonly objectRenderMap = new Map<string, Path2D>();
 
   public render(ctx: CanvasRenderingContext2D): void {
@@ -61,10 +50,9 @@ export class ObjectRendererService implements Renderer, OnDestroy {
         .getIcon(object.icon, object.type)
         .pipe(takeUntil(this.destroy$))
         .subscribe((icon) => {
-          const meshTileRender: MeshTileRender = this.impl().getMeshTileRender(
+          const meshTileRender: MeshTileRender = this.meshService.getMeshTileRender(
             object.meshElementId,
-            meshState,
-          );
+          ) as MeshTileRender;
           const objectPath = new Path2D();
           const scale = iconSize / rawIconDimensions;
           const domMatrix = new DOMMatrix()

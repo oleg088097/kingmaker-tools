@@ -12,5 +12,5 @@ import { DestroyService } from '../../utils/destroy.service';
 })
 export class MapControlsOverlayComponent {
   private readonly destroy$ = inject(DestroyService);
-  protected readonly store: Store<TravelMapModuleState> = inject(Store);
+  protected readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
 }

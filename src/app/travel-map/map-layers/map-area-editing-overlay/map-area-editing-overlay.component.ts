@@ -1,6 +1,6 @@
 import { Directive, inject } from '@angular/core';
 import { AreaEditorPluginService } from '../../services/editors/area-editor-plugin.service';
-import { type MapSimpleOverlayComponent } from '../map-simple-overlay/map-simple-overlay.component';
+import { MapSimpleOverlayComponent } from '../map-simple-overlay/map-simple-overlay.component';
 
 // TODO add initial borders highlight for editing area
 

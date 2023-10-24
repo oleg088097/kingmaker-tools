@@ -30,7 +30,7 @@ import { DestroyService } from '../../../utils/destroy.service';
 })
 export class GlobalDisplayControlComponent {
   private readonly destroy$ = inject(DestroyService);
-  protected readonly store: Store<TravelMapModuleState> = inject(Store);
+  protected readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   protected readonly travelMapDisplaySettingsStateForm = new FormGroup({
     isMeshElementTitleDisplayed: new FormControl<boolean>(true, { nonNullable: true }),
     isFogDisplayed: new FormControl<boolean>(true, { nonNullable: true }),

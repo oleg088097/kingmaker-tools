@@ -14,7 +14,7 @@ import { type Renderer } from './renderer';
 
 @Injectable()
 export class MeshRendererService implements Renderer {
-  private readonly store: Store<TravelMapModuleState> = inject(Store);
+  private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   private readonly displaySettings: Signal<TravelMapDisplaySettingsState> = toSignal(
     this.store.select(travelMapDisplaySettingsFeature.name),
     { requireSync: true },
@@ -43,9 +43,8 @@ export class MeshRendererService implements Renderer {
   public render(ctx: CanvasRenderingContext2D): void {
     const meshState = this.meshState();
     for (const meshElement of Object.values(meshState.meshMap)) {
-      const meshRender = this.impl().getMeshTileRender(meshElement.id, meshState);
-      this.meshRenderMap.set(meshElement.id, meshRender);
-      this.redrawMeshElement(meshElement.id, ctx);
+      const meshRender = this.getMeshTileRender(meshElement.id) as MeshTileRender;
+      this.redrawMeshElement(meshRender, meshElement.id, ctx);
     }
   }
 
@@ -59,26 +58,37 @@ export class MeshRendererService implements Renderer {
     return eventElementIds;
   }
 
-  private redrawMeshElement(meshId: string, ctx: CanvasRenderingContext2D): void {
-    const meshRender = this.meshRenderMap.get(meshId);
-    if (meshRender != null) {
-      ctx.save();
-      const meshMapElement = this.meshState().meshMap[meshId];
-      ctx.fillStyle =
-        this.displaySettings().isFogDisplayed && (meshMapElement?.fog ?? true) ? 'grey' : 'transparent';
-      ctx.fill(meshRender.path);
-      if (this.displaySettings().isMeshElementTitleDisplayed) {
-        ctx.fillStyle = 'black';
-        ctx.font = 'bold 48px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(
-          meshMapElement.title,
-          meshRender.center.x,
-          meshRender.center.y + this.meshState().meshProperties.size * 0.5,
-        );
-      }
-      ctx.restore();
+  public getMeshTileRender(tileId: string): MeshTileRender | null {
+    const meshState = this.meshState();
+    const meshElement = meshState.meshMap[tileId];
+    if (meshElement === undefined) {
+      return null;
     }
+    if (this.meshRenderMap.has(tileId)) {
+      return this.meshRenderMap.get(tileId) as MeshTileRender;
+    }
+    const meshRender = this.impl().getMeshTileRender(meshElement.id, meshState);
+    this.meshRenderMap.set(meshElement.id, meshRender);
+    return meshRender;
+  }
+
+  private redrawMeshElement(meshRender: MeshTileRender, meshId: string, ctx: CanvasRenderingContext2D): void {
+    ctx.save();
+    const meshMapElement = this.meshState().meshMap[meshId];
+    ctx.fillStyle =
+      this.displaySettings().isFogDisplayed && (meshMapElement?.fog ?? true) ? 'grey' : 'transparent';
+    ctx.fill(meshRender.path);
+    if (this.displaySettings().isMeshElementTitleDisplayed) {
+      ctx.fillStyle = 'black';
+      ctx.font = 'bold 48px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(
+        meshMapElement.title,
+        meshRender.center.x,
+        meshRender.center.y + this.meshState().meshProperties.size * 0.5,
+      );
+    }
+    ctx.restore();
   }
 }

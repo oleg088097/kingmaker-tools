@@ -1,25 +1,17 @@
-import { computed, inject, Injectable, type Signal } from '@angular/core';
+import { inject, Injectable, type Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { type TravelMapModuleState } from '../../+state/+module-state';
 import { travelMapAreasFeature } from '../../+state/travel-map-area.state';
-import { travelMapMeshFeature, type TravelMapMeshState } from '../../+state/travel-map-mesh.state';
 import { type MapAreaState } from '../../interfaces/map-area-state';
-import { MESH_TYPE } from '../../interfaces/travel-map-data';
-import { HexMeshAdapterStrategy } from '../mesh-adapters/hex-mesh-adapter-strategy';
-import { type MeshAdapterStrategy } from '../mesh-adapters/mesh-adapter-strategy';
+import { type MeshTileRender } from '../mesh-adapters/mesh-adapter-strategy';
+import { MeshRendererService } from './mesh-renderer.service';
 import { type Renderer } from './renderer';
 
 @Injectable()
 export class AreaRendererService implements Renderer {
-  private readonly store: Store<TravelMapModuleState> = inject(Store);
-  private readonly meshState: Signal<TravelMapMeshState> = toSignal(
-    this.store.select(travelMapMeshFeature.name),
-    {
-      requireSync: true,
-    },
-  );
-
+  private readonly meshService: MeshRendererService = inject(MeshRendererService);
+  private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   private readonly areasState: Signal<Record<string, MapAreaState>> = toSignal(
     this.store.select(travelMapAreasFeature.selectAreas),
     {
@@ -27,31 +19,16 @@ export class AreaRendererService implements Renderer {
     },
   );
 
-  private readonly impl: Signal<MeshAdapterStrategy> = computed(() => {
-    switch (this.meshState().meshProperties.type) {
-      case MESH_TYPE.HEX:
-        return new HexMeshAdapterStrategy();
-        break;
-      case MESH_TYPE.SQUARE:
-        throw new Error('not supported');
-        break;
-      default:
-        throw new Error('not supported');
-        break;
-    }
-  });
-
   private readonly areaRenderMap = new Map<string, Path2D>();
 
   public render(ctx: CanvasRenderingContext2D): void {
-    const meshState = this.meshState();
     const areasState = this.areasState();
     for (const area of Object.values(areasState)) {
       if (area.hidden || area.inEdit === true) {
         continue;
       }
       const areaPath: Path2D = (area.meshElementIds ?? [])
-        .map((id) => this.impl().getMeshTileRender(id, meshState))
+        .map((id) => this.meshService.getMeshTileRender(id) as MeshTileRender)
         .reduce((acc, elem) => {
           acc.addPath(elem.path);
           return acc;

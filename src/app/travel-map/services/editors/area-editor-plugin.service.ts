@@ -31,7 +31,7 @@ export class AreaEditorPluginService implements CanvasManagerPlugin, OnDestroy {
   }
 
   protected readonly canvasElementsGetterService = inject(CanvasElementsGetterService);
-  private readonly store: Store<TravelMapModuleState> = inject(Store);
+  private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   private readonly editAreaState: Signal<Partial<MapAreaState> | null> = toSignal(
     this.store.select(travelMapAreasFeature.selectEditArea),
     {

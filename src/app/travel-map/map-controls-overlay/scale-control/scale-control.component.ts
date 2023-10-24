@@ -22,7 +22,7 @@ export class ScaleControlComponent {
   private static readonly MIN_SCALE = 0.25;
   private static readonly MAX_SCALE = 2;
 
-  private readonly store: Store<TravelMapModuleState> = inject(Store);
+  private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   private readonly destroy$ = inject(DestroyService);
   protected readonly scaleControl = new FormControl<number>(1, { nonNullable: true });
   protected readonly scale: Signal<number> = toSignal(

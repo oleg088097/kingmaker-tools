@@ -11,7 +11,7 @@ import { travelMapImageFeature } from '../../+state/travel-map-image.state';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MapImageComponent {
-  protected store: Store<TravelMapModuleState> = inject(Store);
+  protected store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   protected travelMapImageState = toSignal(this.store.select(travelMapImageFeature.selectImage), {
     requireSync: true,
   });

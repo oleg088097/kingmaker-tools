@@ -17,10 +17,15 @@
 .area-overlay {
   --simple-overlay-z-index: var(--kt-area-overlay-z-index);
 }
+
 .area-edit-overlay {
   --simple-overlay-z-index: var(--kt-area-edit-overlay-z-index);
 }
 
 .object-overlay {
   --simple-overlay-z-index: var(--kt-object-overlay-z-index);
+}
+
+.object-edit-overlay {
+  --simple-overlay-z-index: var(--kt-object-edit-overlay-z-index);
 }

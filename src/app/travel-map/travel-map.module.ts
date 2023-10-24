@@ -26,15 +26,19 @@ import { MapControlsOverlayComponent } from './map-controls-overlay/map-controls
 import { ScaleControlComponent } from './map-controls-overlay/scale-control/scale-control.component';
 import { MapAreaEditingOverlayDirective } from './map-layers/map-area-editing-overlay/map-area-editing-overlay.component';
 import { MapImageComponent } from './map-layers/map-image/map-image.component';
+import { MapObjectEditingOverlayDirective } from './map-layers/map-object-editing-overlay/map-object-editing-overlay.component';
 import { MapSimpleOverlayComponent } from './map-layers/map-simple-overlay/map-simple-overlay.component';
 import { CanvasElementsGetterService } from './services/canvas-elements-getter.service';
 import { CanvasManagerProviderService } from './services/canvas-manager-provider.service';
 import { AreaEditorPluginService } from './services/editors/area-editor-plugin.service';
+import { ObjectEditorPluginService } from './services/editors/object-editor-plugin.service';
 import { MapIconRegistryService } from './services/map-icon-registry.service';
+import { MeshRelativeCoordsCalcService } from './services/mesh-relative-coords-calc.service';
 import { RendererProviderService } from './services/renderer-provider.service';
 import { AreaEditRendererService } from './services/renderers/area-edit-renderer.service';
 import { AreaRendererService } from './services/renderers/area-renderer.service';
 import { MeshRendererService } from './services/renderers/mesh-renderer.service';
+import { ObjectEditRendererService } from './services/renderers/object-edit-renderer.service';
 import { ObjectRendererService } from './services/renderers/object-renderer.service';
 import { TravelMapComponent } from './travel-map/travel-map.component';
 
@@ -49,6 +53,7 @@ import { TravelMapComponent } from './travel-map/travel-map.component';
     ScaleControlComponent,
     MapSimpleOverlayComponent,
     MapAreaEditingOverlayDirective,
+    MapObjectEditingOverlayDirective,
   ],
   imports: [
     CommonModule,
@@ -78,14 +83,17 @@ import { TravelMapComponent } from './travel-map/travel-map.component';
   ],
   providers: [
     AreaEditorPluginService,
+    ObjectEditorPluginService,
     MapIconRegistryService,
     MeshRendererService,
     AreaRendererService,
     AreaEditRendererService,
     ObjectRendererService,
+    ObjectEditRendererService,
     CanvasManagerProviderService,
     CanvasElementsGetterService,
     RendererProviderService,
+    MeshRelativeCoordsCalcService,
   ],
 })
 export class TravelMapModule {}
