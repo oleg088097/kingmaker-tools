@@ -6,6 +6,7 @@ import { type TravelMapModuleState } from '../../+state/+module-state';
 import { travelMapMeshFeature, type TravelMapMeshState } from '../../+state/travel-map-mesh.state';
 import { travelMapObjectsFeature } from '../../+state/travel-map-objects.state';
 import { type MapObjectState } from '../../interfaces/map-object-state';
+import { IconCoordsCalculatorService } from '../icon-coords-calculator.service';
 import { MapIconRegistryService } from '../map-icon-registry.service';
 import { type MeshTileRender } from '../mesh-adapters/mesh-adapter-strategy';
 import { MeshRendererService } from './mesh-renderer.service';
@@ -17,6 +18,9 @@ export class ObjectRendererService implements Renderer, OnDestroy {
   private readonly meshService: MeshRendererService = inject(MeshRendererService);
   private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   private readonly iconRegistry: MapIconRegistryService = inject(MapIconRegistryService);
+  private readonly iconCoordsCalculatorService: IconCoordsCalculatorService =
+    inject(IconCoordsCalculatorService);
+
   private readonly meshState: Signal<TravelMapMeshState> = toSignal(
     this.store.select(travelMapMeshFeature.name),
     {
@@ -35,7 +39,13 @@ export class ObjectRendererService implements Renderer, OnDestroy {
     },
   );
 
-  private readonly objectRenderMap = new Map<string, Path2D>();
+  private readonly objectRenderMap = new Map<
+    string,
+    {
+      path: Path2D;
+      centerPoint: { x: number; y: number };
+    }
+  >();
 
   public render(ctx: CanvasRenderingContext2D): void {
     const meshState = this.meshState();
@@ -55,15 +65,22 @@ export class ObjectRendererService implements Renderer, OnDestroy {
           ) as MeshTileRender;
           const objectPath = new Path2D();
           const scale = iconSize / rawIconDimensions;
+          const halfIconSize = iconSize / 2;
           const domMatrix = new DOMMatrix()
             .translate(
-              meshTileRender.center.x + object.meshElementCenterRelativeX,
-              meshTileRender.center.y + object.meshElementCenterRelativeY,
+              meshTileRender.center.x + object.meshElementCenterRelativeX - halfIconSize,
+              meshTileRender.center.y + object.meshElementCenterRelativeY - halfIconSize,
             )
             .scale(scale);
           const iconPath = new Path2D(icon);
           objectPath.addPath(iconPath, domMatrix);
-          this.objectRenderMap.set(object.id, objectPath);
+          this.objectRenderMap.set(object.id, {
+            path: objectPath,
+            centerPoint: {
+              x: meshTileRender.center.x + object.meshElementCenterRelativeX,
+              y: meshTileRender.center.y + object.meshElementCenterRelativeY,
+            },
+          });
           this.redrawObject(object.id, ctx);
         });
     }
@@ -71,8 +88,15 @@ export class ObjectRendererService implements Renderer, OnDestroy {
 
   public getCoordsElements(x: number, y: number, ctx: CanvasRenderingContext2D): string[] {
     const eventElementIds: string[] = [];
-    for (const [key, path] of this.objectRenderMap.entries()) {
-      if (ctx.isPointInPath(path, x, y)) {
+    for (const [key, render] of this.objectRenderMap.entries()) {
+      if (
+        this.iconCoordsCalculatorService.isPointInBoundingRect(
+          x,
+          y,
+          render.centerPoint.x,
+          render.centerPoint.y,
+        )
+      ) {
         eventElementIds.push(key);
       }
     }
@@ -80,12 +104,12 @@ export class ObjectRendererService implements Renderer, OnDestroy {
   }
 
   private redrawObject(objectId: string, ctx: CanvasRenderingContext2D): void {
-    const path = this.objectRenderMap.get(objectId);
-    if (path != null) {
+    const render = this.objectRenderMap.get(objectId);
+    if (render != null) {
       ctx.save();
       const object = this.objectsState()[objectId];
       ctx.fillStyle = object.color;
-      ctx.fill(path);
+      ctx.fill(render.path);
       ctx.restore();
     }
   }

@@ -3,10 +3,10 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { Subject, takeUntil } from 'rxjs';
 import { type TravelMapModuleState } from '../../+state/+module-state';
-import { travelMapMeshFeature, type TravelMapMeshState } from '../../+state/travel-map-mesh.state';
 import { travelMapObjectsFeature } from '../../+state/travel-map-objects.state';
 import { DEFAULT_OBJECT_FILL_COLOR } from '../../constants/default-color';
 import { type MapObjectEditState } from '../../interfaces/map-object-state';
+import { IconCoordsCalculatorService } from '../icon-coords-calculator.service';
 import { MapIconRegistryService } from '../map-icon-registry.service';
 import { type MeshTileRender } from '../mesh-adapters/mesh-adapter-strategy';
 import { MeshRendererService } from './mesh-renderer.service';
@@ -19,12 +19,8 @@ export class ObjectEditRendererService implements Renderer, OnDestroy {
   private readonly meshService: MeshRendererService = inject(MeshRendererService);
   private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   private readonly iconRegistry: MapIconRegistryService = inject(MapIconRegistryService);
-  private readonly meshState: Signal<TravelMapMeshState> = toSignal(
-    this.store.select(travelMapMeshFeature.name),
-    {
-      requireSync: true,
-    },
-  );
+  private readonly iconCoordsCalculatorService: IconCoordsCalculatorService =
+    inject(IconCoordsCalculatorService);
 
   public ngOnDestroy(): void {
     this.destroy$.next();
@@ -37,10 +33,12 @@ export class ObjectEditRendererService implements Renderer, OnDestroy {
     },
   );
 
-  private editObjectRender: Path2D | null = null;
+  private editObjectRender: {
+    path: Path2D;
+    centerPoint: { x: number; y: number };
+  } | null = null;
 
   public render(ctx: CanvasRenderingContext2D): void {
-    const meshState = this.meshState();
     const editObjectState = this.editObjectState();
 
     if (editObjectState == null) {
@@ -49,7 +47,7 @@ export class ObjectEditRendererService implements Renderer, OnDestroy {
     }
 
     const rawIconDimensions = 512;
-    const iconSize = meshState.meshProperties.size / 2;
+    const iconSize = this.iconCoordsCalculatorService.getIconSize();
     this.iconRegistry
       .getIcon(editObjectState.icon, editObjectState.type)
       .pipe(takeUntil(this.destroy$))
@@ -59,15 +57,22 @@ export class ObjectEditRendererService implements Renderer, OnDestroy {
         ) as MeshTileRender;
         const objectPath = new Path2D();
         const scale = iconSize / rawIconDimensions;
+        const halfIconSize = iconSize / 2;
         const domMatrix = new DOMMatrix()
           .translate(
-            meshTileRender.center.x + editObjectState.meshElementCenterRelativeX,
-            meshTileRender.center.y + editObjectState.meshElementCenterRelativeY,
+            meshTileRender.center.x + editObjectState.meshElementCenterRelativeX - halfIconSize,
+            meshTileRender.center.y + editObjectState.meshElementCenterRelativeY - halfIconSize,
           )
           .scale(scale);
         const iconPath = new Path2D(icon);
         objectPath.addPath(iconPath, domMatrix);
-        this.editObjectRender = objectPath;
+        this.editObjectRender = {
+          path: objectPath,
+          centerPoint: {
+            x: meshTileRender.center.x + editObjectState.meshElementCenterRelativeX,
+            y: meshTileRender.center.y + editObjectState.meshElementCenterRelativeY,
+          },
+        };
         this.redrawObject(editObjectState, ctx);
       });
   }
@@ -77,7 +82,12 @@ export class ObjectEditRendererService implements Renderer, OnDestroy {
     if (
       editObjectState?.id != null &&
       this.editObjectRender != null &&
-      ctx.isPointInPath(this.editObjectRender, x, y)
+      this.iconCoordsCalculatorService.isPointInBoundingRect(
+        x,
+        y,
+        this.editObjectRender.centerPoint.x,
+        this.editObjectRender.centerPoint.y,
+      )
     ) {
       return [editObjectState.id];
     }
@@ -85,11 +95,11 @@ export class ObjectEditRendererService implements Renderer, OnDestroy {
   }
 
   private redrawObject(editObjectState: MapObjectEditState, ctx: CanvasRenderingContext2D): void {
-    const path = this.editObjectRender;
-    if (path != null) {
+    const render = this.editObjectRender;
+    if (render != null) {
       ctx.save();
       ctx.fillStyle = editObjectState.color ?? DEFAULT_OBJECT_FILL_COLOR;
-      ctx.fill(path);
+      ctx.fill(render.path);
       ctx.restore();
     }
   }
