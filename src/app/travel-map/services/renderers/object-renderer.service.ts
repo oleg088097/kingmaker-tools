@@ -6,9 +6,8 @@ import { type TravelMapModuleState } from '../../+state/+module-state';
 import { travelMapMeshFeature, type TravelMapMeshState } from '../../+state/travel-map-mesh.state';
 import { travelMapObjectsFeature } from '../../+state/travel-map-objects.state';
 import { type MapObjectState } from '../../interfaces/map-object-state';
-import { IconCoordsCalculatorService } from '../icon-coords-calculator.service';
 import { MapIconRegistryService } from '../map-icon-registry.service';
-import { type MeshTileRender } from '../mesh-adapters/mesh-adapter-strategy';
+import { ObjectCoordsCalculatorService } from '../object-coords-calculator.service';
 import { MeshRendererService } from './mesh-renderer.service';
 import { type Renderer } from './renderer';
 
@@ -18,8 +17,9 @@ export class ObjectRendererService implements Renderer, OnDestroy {
   private readonly meshService: MeshRendererService = inject(MeshRendererService);
   private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   private readonly iconRegistry: MapIconRegistryService = inject(MapIconRegistryService);
-  private readonly iconCoordsCalculatorService: IconCoordsCalculatorService =
-    inject(IconCoordsCalculatorService);
+  private readonly objectCoordsCalculatorService: ObjectCoordsCalculatorService = inject(
+    ObjectCoordsCalculatorService,
+  );
 
   private readonly meshState: Signal<TravelMapMeshState> = toSignal(
     this.store.select(travelMapMeshFeature.name),
@@ -48,10 +48,7 @@ export class ObjectRendererService implements Renderer, OnDestroy {
   >();
 
   public render(ctx: CanvasRenderingContext2D): void {
-    const meshState = this.meshState();
     const objectsState = this.objectsState();
-    const rawIconDimensions = 512;
-    const iconSize = meshState.meshProperties.size / 2;
     for (const object of Object.values(objectsState)) {
       if (object.hidden || object.inEdit === true) {
         continue;
@@ -60,26 +57,17 @@ export class ObjectRendererService implements Renderer, OnDestroy {
         .getIcon(object.icon, object.type)
         .pipe(takeUntil(this.destroy$))
         .subscribe((icon) => {
-          const meshTileRender: MeshTileRender = this.meshService.getMeshTileRender(
-            object.meshElementId,
-          ) as MeshTileRender;
           const objectPath = new Path2D();
-          const scale = iconSize / rawIconDimensions;
-          const halfIconSize = iconSize / 2;
+          const objectScale = this.objectCoordsCalculatorService.getObjectIconScale(icon);
+          const objectPosition = this.objectCoordsCalculatorService.calculateObjectPosition(object);
           const domMatrix = new DOMMatrix()
-            .translate(
-              meshTileRender.center.x + object.meshElementCenterRelativeX - halfIconSize,
-              meshTileRender.center.y + object.meshElementCenterRelativeY - halfIconSize,
-            )
-            .scale(scale);
+            .translate(objectPosition.topLeft.x, objectPosition.topLeft.y)
+            .scale(objectScale);
           const iconPath = new Path2D(icon);
           objectPath.addPath(iconPath, domMatrix);
           this.objectRenderMap.set(object.id, {
             path: objectPath,
-            centerPoint: {
-              x: meshTileRender.center.x + object.meshElementCenterRelativeX,
-              y: meshTileRender.center.y + object.meshElementCenterRelativeY,
-            },
+            centerPoint: objectPosition.center,
           });
           this.redrawObject(object.id, ctx);
         });
@@ -90,7 +78,7 @@ export class ObjectRendererService implements Renderer, OnDestroy {
     const eventElementIds: string[] = [];
     for (const [key, render] of this.objectRenderMap.entries()) {
       if (
-        this.iconCoordsCalculatorService.isPointInBoundingRect(
+        this.objectCoordsCalculatorService.isPointInBoundingRect(
           x,
           y,
           render.centerPoint.x,

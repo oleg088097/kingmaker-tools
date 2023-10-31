@@ -32,9 +32,9 @@ import { CanvasElementsGetterService } from './services/canvas-elements-getter.s
 import { CanvasManagerProviderService } from './services/canvas-manager-provider.service';
 import { AreaEditorPluginService } from './services/editors/area-editor-plugin.service';
 import { ObjectEditorPluginService } from './services/editors/object-editor-plugin.service';
-import { IconCoordsCalculatorService } from './services/icon-coords-calculator.service';
 import { MapIconRegistryService } from './services/map-icon-registry.service';
 import { MeshRelativeCoordsCalcService } from './services/mesh-relative-coords-calc.service';
+import { ObjectCoordsCalculatorService } from './services/object-coords-calculator.service';
 import { RendererProviderService } from './services/renderer-provider.service';
 import { AreaEditRendererService } from './services/renderers/area-edit-renderer.service';
 import { AreaRendererService } from './services/renderers/area-renderer.service';
@@ -95,7 +95,7 @@ import { TravelMapComponent } from './travel-map/travel-map.component';
     CanvasElementsGetterService,
     RendererProviderService,
     MeshRelativeCoordsCalcService,
-    IconCoordsCalculatorService,
+    ObjectCoordsCalculatorService,
   ],
 })
 export class TravelMapModule {}

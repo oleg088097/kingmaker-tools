@@ -89,7 +89,6 @@ export class ObjectEditorPluginService implements CanvasManagerPlugin, OnDestroy
     if (editObjectState == null) {
       return;
     }
-    // TODO use not mouse position but object's center
     const meshElementId = this.canvasElementsGetterService.getMeshElementFromEvent(mouseMoveEvent);
     if (meshElementId == null) {
       return;

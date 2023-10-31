@@ -6,21 +6,19 @@ import { type TravelMapModuleState } from '../../+state/+module-state';
 import { travelMapObjectsFeature } from '../../+state/travel-map-objects.state';
 import { DEFAULT_OBJECT_FILL_COLOR } from '../../constants/default-color';
 import { type MapObjectEditState } from '../../interfaces/map-object-state';
-import { IconCoordsCalculatorService } from '../icon-coords-calculator.service';
 import { MapIconRegistryService } from '../map-icon-registry.service';
-import { type MeshTileRender } from '../mesh-adapters/mesh-adapter-strategy';
-import { MeshRendererService } from './mesh-renderer.service';
+import { ObjectCoordsCalculatorService } from '../object-coords-calculator.service';
 import { type Renderer } from './renderer';
 
 // TODO highlight mesh with editable object
 @Injectable()
 export class ObjectEditRendererService implements Renderer, OnDestroy {
   private readonly destroy$ = new Subject<void>();
-  private readonly meshService: MeshRendererService = inject(MeshRendererService);
   private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   private readonly iconRegistry: MapIconRegistryService = inject(MapIconRegistryService);
-  private readonly iconCoordsCalculatorService: IconCoordsCalculatorService =
-    inject(IconCoordsCalculatorService);
+  private readonly objectCoordsCalculatorService: ObjectCoordsCalculatorService = inject(
+    ObjectCoordsCalculatorService,
+  );
 
   public ngOnDestroy(): void {
     this.destroy$.next();
@@ -46,32 +44,21 @@ export class ObjectEditRendererService implements Renderer, OnDestroy {
       return;
     }
 
-    const rawIconDimensions = 512;
-    const iconSize = this.iconCoordsCalculatorService.getIconSize();
     this.iconRegistry
       .getIcon(editObjectState.icon, editObjectState.type)
       .pipe(takeUntil(this.destroy$))
       .subscribe((icon) => {
-        const meshTileRender: MeshTileRender = this.meshService.getMeshTileRender(
-          editObjectState.meshElementId,
-        ) as MeshTileRender;
         const objectPath = new Path2D();
-        const scale = iconSize / rawIconDimensions;
-        const halfIconSize = iconSize / 2;
+        const objectPosition = this.objectCoordsCalculatorService.calculateObjectPosition(editObjectState);
+        const objectScale = this.objectCoordsCalculatorService.getObjectIconScale(icon);
         const domMatrix = new DOMMatrix()
-          .translate(
-            meshTileRender.center.x + editObjectState.meshElementCenterRelativeX - halfIconSize,
-            meshTileRender.center.y + editObjectState.meshElementCenterRelativeY - halfIconSize,
-          )
-          .scale(scale);
+          .translate(objectPosition.topLeft.x, objectPosition.topLeft.y)
+          .scale(objectScale);
         const iconPath = new Path2D(icon);
         objectPath.addPath(iconPath, domMatrix);
         this.editObjectRender = {
           path: objectPath,
-          centerPoint: {
-            x: meshTileRender.center.x + editObjectState.meshElementCenterRelativeX,
-            y: meshTileRender.center.y + editObjectState.meshElementCenterRelativeY,
-          },
+          centerPoint: objectPosition.center,
         };
         this.redrawObject(editObjectState, ctx);
       });
@@ -82,7 +69,7 @@ export class ObjectEditRendererService implements Renderer, OnDestroy {
     if (
       editObjectState?.id != null &&
       this.editObjectRender != null &&
-      this.iconCoordsCalculatorService.isPointInBoundingRect(
+      this.objectCoordsCalculatorService.isPointInBoundingRect(
         x,
         y,
         this.editObjectRender.centerPoint.x,
