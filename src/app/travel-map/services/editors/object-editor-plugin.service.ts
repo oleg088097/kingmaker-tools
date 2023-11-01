@@ -1,7 +1,7 @@
 import { inject, Injectable, type OnDestroy, type Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
-import { filter, first, fromEvent, merge, Subject, takeUntil } from 'rxjs';
+import { combineLatest, EMPTY, filter, first, fromEvent, merge, Subject, switchMap, takeUntil } from 'rxjs';
 import { type TravelMapModuleState } from '../../+state/+module-state';
 import { TravelMapObjectsActions, travelMapObjectsFeature } from '../../+state/travel-map-objects.state';
 import { type MapObjectEditState } from '../../interfaces/map-object-state';
@@ -12,29 +12,11 @@ import { MeshRelativeCoordsCalcService } from '../mesh-relative-coords-calc.serv
 @Injectable()
 export class ObjectEditorPluginService implements CanvasManagerPlugin, OnDestroy {
   private readonly destroy$ = new Subject<void>();
+  private readonly canvas$ = new Subject<HTMLCanvasElement | null>();
   private readonly detach$ = new Subject<void>();
-  private _canvas?: HTMLCanvasElement;
-
-  public attach(canvasElement: HTMLCanvasElement | null): void {
-    this.detach();
-    if (canvasElement == null) {
-      return;
-    }
-    this._canvas = canvasElement;
-    fromEvent<MouseEvent>(canvasElement, 'mousedown')
-      .pipe(takeUntil(merge(this.destroy$, this.detach$)))
-      .subscribe(this.registerMouseListener.bind(this, canvasElement));
-  }
-
-  public detach(): void {
-    this.detach$.next();
-    this._canvas = undefined;
-  }
-
-  private readonly meshRelativeCoordsCalcService: MeshRelativeCoordsCalcService = inject(
-    MeshRelativeCoordsCalcService,
-  );
-
+  private readonly destroyDownListener$: Subject<void> = new Subject<void>();
+  private readonly destroyMoveListeners$: Subject<void> = new Subject<void>();
+  private mouseMoveInProgress: boolean = false;
   private readonly canvasElementsGetterService = inject(CanvasElementsGetterService);
   private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   private readonly editObjectState: Signal<MapObjectEditState | null> = toSignal(
@@ -44,14 +26,48 @@ export class ObjectEditorPluginService implements CanvasManagerPlugin, OnDestroy
     },
   );
 
-  private readonly destroyMoveListeners$: Subject<void> = new Subject<void>();
-  private mouseMoveInProgress: boolean = false;
+  private readonly meshRelativeCoordsCalcService: MeshRelativeCoordsCalcService = inject(
+    MeshRelativeCoordsCalcService,
+  );
 
-  public ngOnDestroy(): void {
-    this.destroy$.next();
+  public attach(canvasElement: HTMLCanvasElement | null): void {
+    this.detach();
+    if (canvasElement == null) {
+      return;
+    }
+    this.canvas$.next(canvasElement);
   }
 
-  private registerMouseListener(htmlElement: HTMLElement, mouseDownEvent: MouseEvent): void {
+  constructor() {
+    combineLatest([this.store.select(travelMapObjectsFeature.selectEditObject), this.canvas$])
+      .pipe(
+        switchMap(([editObjectState, canvasElement]) => {
+          if (editObjectState != null && canvasElement != null) {
+            canvasElement?.removeAttribute('style');
+            return fromEvent<MouseEvent>(canvasElement, 'mousedown').pipe(
+              takeUntil(merge(this.detach$, this.destroyDownListener$)),
+            );
+          } else {
+            //
+            canvasElement?.setAttribute('style', 'pointer-events:none;');
+            this.destroyDownListener$.next();
+            return EMPTY;
+          }
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe(this.registerMouseListener.bind(this));
+  }
+
+  public detach(): void {
+    this.detach$.next();
+  }
+
+  public ngOnDestroy(): void {
+    this.detach();
+  }
+
+  private registerMouseListener(mouseDownEvent: MouseEvent): void {
     const editObjectState = this.editObjectState();
     if (editObjectState == null) {
       return;
@@ -64,11 +80,11 @@ export class ObjectEditorPluginService implements CanvasManagerPlugin, OnDestroy
     this.destroyMoveListeners$.next();
     const mouseup$ = fromEvent<MouseEvent>(document.body, 'mouseup').pipe(
       first(),
-      takeUntil(merge(this.destroy$, this.detach$, this.destroyMoveListeners$)),
+      takeUntil(merge(this.detach$, this.destroyMoveListeners$)),
     );
     mouseup$.pipe(filter(() => this.mouseMoveInProgress)).subscribe(this.objectDropHandler.bind(this));
-    fromEvent<MouseEvent>(htmlElement, 'mousemove')
-      .pipe(takeUntil(merge(mouseup$, this.destroy$, this.detach$, this.destroyMoveListeners$)))
+    fromEvent<MouseEvent>(mouseDownEvent.currentTarget as HTMLElement, 'mousemove')
+      .pipe(takeUntil(merge(mouseup$, this.detach$, this.destroyMoveListeners$)))
       .subscribe(this.objectDragHandler.bind(this));
   }
 

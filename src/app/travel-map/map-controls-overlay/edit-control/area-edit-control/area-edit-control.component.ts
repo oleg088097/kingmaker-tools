@@ -4,20 +4,18 @@ import {
   computed,
   effect,
   inject,
-  signal,
   untracked,
   type Signal,
-  type WritableSignal,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { isEqual } from 'lodash';
 import { distinctUntilChanged, first, map, startWith, takeUntil } from 'rxjs';
-import { type TravelMapModuleState } from '../../+state/+module-state';
-import { TravelMapAreasActions, travelMapAreasFeature } from '../../+state/travel-map-area.state';
-import { DestroyService } from '../../../utils/destroy.service';
-import { type MapAreaState } from '../../interfaces/map-area-state';
+import { type TravelMapModuleState } from '../../../+state/+module-state';
+import { TravelMapAreasActions, travelMapAreasFeature } from '../../../+state/travel-map-area.state';
+import { DestroyService } from '../../../../utils/destroy.service';
+import { type MapAreaState } from '../../../interfaces/map-area-state';
 
 @Component({
   selector: 'app-area-edit-control',
@@ -29,15 +27,6 @@ import { type MapAreaState } from '../../interfaces/map-area-state';
 export class AreaEditControlComponent {
   private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   private readonly destroy$ = inject(DestroyService);
-  protected readonly isHideDisplayControls: WritableSignal<boolean> = signal(false);
-  /*
-  protected readonly isTouchUI: Signal<boolean> = toSignal(
-    inject(BreakpointObserver)
-      .observe('(max-width: 767px)')
-      .pipe(map((breakpoint) => breakpoint.matches)),
-    { requireSync: true },
-  );
-  */
 
   protected readonly editAreaState: Signal<Partial<MapAreaState> | null> = toSignal(
     this.store.select(travelMapAreasFeature.selectEditArea),

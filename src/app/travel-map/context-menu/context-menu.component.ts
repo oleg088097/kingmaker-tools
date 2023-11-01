@@ -12,13 +12,12 @@ import { DestroyService } from '../../utils/destroy.service';
 import { DEFAULT_OBJECT_FILL_COLOR } from '../constants/default-color';
 import { DEFAULT_OBJECT_ICON } from '../constants/default-object-icon';
 import { type MapAreaState } from '../interfaces/map-area-state';
-import { ICON_TYPE, type MapObjectEditState } from '../interfaces/map-object-state';
+import { ICON_TYPE, type MapObjectEditState, type MapObjectState } from '../interfaces/map-object-state';
 import { type MeshElementState } from '../interfaces/mesh-element-state';
 import { MeshRelativeCoordsCalcService } from '../services/mesh-relative-coords-calc.service';
-import { MeshRendererService } from '../services/renderers/mesh-renderer.service';
 
 export interface ContextMenuData {
-  meshId: string;
+  meshId?: string;
   areaIds: string[];
   objectIds: string[];
   event: MouseEvent;
@@ -41,14 +40,13 @@ export class ContextMenuComponent {
   private readonly overlayRef: OverlayRef = inject(OVERLAY_REF);
   private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   private readonly destroy$ = inject(DestroyService);
-  private readonly meshService: MeshRendererService = inject(MeshRendererService);
   private readonly meshRelativeCoordsCalcService: MeshRelativeCoordsCalcService = inject(
     MeshRelativeCoordsCalcService,
   );
 
-  protected mesh: Signal<MeshElementState> = toSignal(
+  protected mesh: Signal<MeshElementState | null> = toSignal(
     this.store.select(travelMapMeshFeature.selectMeshMap).pipe(
-      map((meshMap) => meshMap[this.data.meshId]),
+      map((meshMap) => (this.data.meshId !== undefined ? meshMap[this.data.meshId] : null)),
       takeUntil(this.destroy$),
     ),
     { requireSync: true },
@@ -57,6 +55,14 @@ export class ContextMenuComponent {
   protected areas: Signal<MapAreaState[]> = toSignal(
     this.store.select(travelMapAreasFeature.selectAreas).pipe(
       map((areaMap) => this.data.areaIds.map((areaId) => areaMap[areaId])),
+      takeUntil(this.destroy$),
+    ),
+    { requireSync: true },
+  );
+
+  protected objects: Signal<MapObjectState[]> = toSignal(
+    this.store.select(travelMapObjectsFeature.selectObjects).pipe(
+      map((areaMap) => this.data.objectIds.map((objectId) => areaMap[objectId])),
       takeUntil(this.destroy$),
     ),
     { requireSync: true },
@@ -76,12 +82,12 @@ export class ContextMenuComponent {
     },
   );
 
-  protected switchFogForMeshElement(): void {
+  protected switchFogForMeshElement(mesh: MeshElementState): void {
     this.store.dispatch(
       TravelMapMeshActions.upsertMeshElement({
         value: {
-          ...this.mesh(),
-          fog: !this.mesh().fog,
+          ...mesh,
+          fog: !mesh.fog,
         },
       }),
     );
@@ -120,11 +126,11 @@ export class ContextMenuComponent {
     };
   }
 
-  protected getDefaultObjectState(): MapObjectEditState | null {
+  protected getDefaultObjectState(mesh: MeshElementState): MapObjectEditState | null {
     const relativeCoords = this.meshRelativeCoordsCalcService.calculateRelativeCoordinates(
       this.data.event.offsetX,
       this.data.event.offsetY,
-      this.data.meshId,
+      mesh.id,
     );
 
     if (relativeCoords === null) {
@@ -135,7 +141,7 @@ export class ContextMenuComponent {
       color: DEFAULT_OBJECT_FILL_COLOR,
       icon: DEFAULT_OBJECT_ICON,
       type: ICON_TYPE.default,
-      meshElementId: this.data.meshId,
+      meshElementId: mesh.id,
       meshElementCenterRelativeX: relativeCoords.x,
       meshElementCenterRelativeY: relativeCoords.y,
     };

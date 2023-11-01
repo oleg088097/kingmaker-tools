@@ -31,7 +31,7 @@ export class ObjectCoordsCalculatorService {
     return meshState.meshProperties.size / 2;
   }
 
-  public getObjectIconScale(icon: string): number {
+  public getObjectIconScale(iconPath: string): number {
     const rawIconDimensions = 512;
     const iconSize = this.getIconSize();
     return iconSize / rawIconDimensions;

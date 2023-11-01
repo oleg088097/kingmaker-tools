@@ -1,7 +1,7 @@
-import { inject, Injectable, type OnDestroy, type Signal } from '@angular/core';
+import { Injectable, inject, type OnDestroy, type Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
-import { first, fromEvent, merge, Subject, takeUntil } from 'rxjs';
+import { EMPTY, Subject, combineLatest, first, fromEvent, merge, switchMap, takeUntil } from 'rxjs';
 import { type TravelMapModuleState } from '../../+state/+module-state';
 import { TravelMapAreasActions, travelMapAreasFeature } from '../../+state/travel-map-area.state';
 import { type MapAreaState } from '../../interfaces/map-area-state';
@@ -11,27 +11,13 @@ import { type CanvasManagerPlugin } from '../canvas-manager-provider.service';
 @Injectable()
 export class AreaEditorPluginService implements CanvasManagerPlugin, OnDestroy {
   private readonly destroy$ = new Subject<void>();
+  private readonly canvas$ = new Subject<HTMLCanvasElement | null>();
   private readonly detach$ = new Subject<void>();
-  private _canvas?: HTMLCanvasElement;
-
-  public attach(canvasElement: HTMLCanvasElement | null): void {
-    this.detach();
-    if (canvasElement == null) {
-      return;
-    }
-    this._canvas = canvasElement;
-    fromEvent<MouseEvent>(canvasElement, 'mousedown')
-      .pipe(takeUntil(merge(this.destroy$, this.detach$)))
-      .subscribe(this.registerMouseListener.bind(this, canvasElement));
-  }
-
-  public detach(): void {
-    this.detach$.next();
-    this._canvas = undefined;
-  }
-
-  protected readonly canvasElementsGetterService = inject(CanvasElementsGetterService);
   private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
+  protected readonly canvasElementsGetterService = inject(CanvasElementsGetterService);
+  private readonly mouseMoveMeshIds: Set<string> = new Set<string>();
+  private readonly destroyMoveUpListeners$: Subject<void> = new Subject<void>();
+  private readonly destroyDownListener$: Subject<void> = new Subject<void>();
   private readonly editAreaState: Signal<Partial<MapAreaState> | null> = toSignal(
     this.store.select(travelMapAreasFeature.selectEditArea),
     {
@@ -39,10 +25,40 @@ export class AreaEditorPluginService implements CanvasManagerPlugin, OnDestroy {
     },
   );
 
-  private readonly mouseMoveMeshIds: Set<string> = new Set<string>();
-  private readonly destroyMoveListeners$: Subject<void> = new Subject<void>();
+  public attach(canvasElement: HTMLCanvasElement | null): void {
+    this.detach();
+    if (canvasElement == null) {
+      return;
+    }
+    this.canvas$.next(canvasElement);
+  }
+
+  constructor() {
+    combineLatest([this.store.select(travelMapAreasFeature.selectEditArea), this.canvas$])
+      .pipe(
+        switchMap(([editAreaState, canvasElement]) => {
+          if (editAreaState != null && canvasElement != null) {
+            canvasElement?.removeAttribute('style');
+            return fromEvent<MouseEvent>(canvasElement, 'mousedown').pipe(
+              takeUntil(merge(this.detach$, this.destroyDownListener$)),
+            );
+          } else {
+            canvasElement?.setAttribute('style', 'pointer-events:none;');
+            this.destroyDownListener$.next();
+            return EMPTY;
+          }
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe(this.registerMouseListener.bind(this));
+  }
+
+  public detach(): void {
+    this.detach$.next();
+  }
 
   public ngOnDestroy(): void {
+    this.detach();
     this.destroy$.next();
   }
 
@@ -64,7 +80,7 @@ export class AreaEditorPluginService implements CanvasManagerPlugin, OnDestroy {
     return editAreaState.meshElementIds?.findIndex((id) => id === meshId) ?? -1;
   }
 
-  private registerMouseListener(htmlElement: HTMLElement, mouseDownEvent: MouseEvent): void {
+  private registerMouseListener(mouseDownEvent: MouseEvent): void {
     const editAreaState = this.editAreaState();
     if (editAreaState == null) {
       return;
@@ -73,21 +89,21 @@ export class AreaEditorPluginService implements CanvasManagerPlugin, OnDestroy {
     if (meshId == null) {
       return;
     }
-    this.destroyMoveListeners$.next();
+    this.destroyMoveUpListeners$.next();
     let mouseMoveInProgress: boolean = false;
     this.mouseMoveMeshIds.clear();
     const mouseMoveMode = this.getAreaEditMode(mouseDownEvent);
     const mouseup$ = fromEvent<MouseEvent>(document.body, 'mouseup').pipe(
       first(),
-      takeUntil(merge(this.destroy$, this.detach$, this.destroyMoveListeners$)),
+      takeUntil(merge(this.detach$, this.destroyMoveUpListeners$)),
     );
     mouseup$.subscribe((mouseUpEvent) => {
       if (!mouseMoveInProgress) {
         this.areaEditingClickHandler(mouseUpEvent);
       }
     });
-    fromEvent<MouseEvent>(htmlElement, 'mousemove')
-      .pipe(takeUntil(merge(mouseup$, this.destroy$, this.detach$, this.destroyMoveListeners$)))
+    fromEvent<MouseEvent>(mouseDownEvent.currentTarget as HTMLElement, 'mousemove')
+      .pipe(takeUntil(merge(mouseup$, this.detach$, this.destroyMoveUpListeners$)))
       .subscribe((mouseMoveEvent: MouseEvent) => {
         mouseMoveInProgress = true;
         const editAreaState = this.editAreaState();

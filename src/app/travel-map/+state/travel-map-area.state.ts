@@ -2,13 +2,12 @@ import { createActionGroup, createFeature, createReducer, on, props } from '@ngr
 import { cloneDeep } from 'lodash';
 import { GlobalActions, UPDATE_ACTION_CREATOR } from '../../+state/global.actions';
 import { type MapAreaState } from '../interfaces/map-area-state';
-import { type TravelMapData } from '../interfaces/travel-map-data';
+import { TravelMapActions } from './+module-state';
 import { type VersionedState } from './versioned-state';
 
 export const TravelMapAreasActions = createActionGroup({
   source: 'Travel Map Areas',
   events: {
-    fromSeed: props<{ data: TravelMapData }>(),
     upsertArea: props<{ value: MapAreaState }>(),
     updateEditArea: props<{ value: Partial<MapAreaState> | null }>(),
   },
@@ -46,7 +45,7 @@ export const travelMapAreasFeature = createFeature({
         areas,
       };
     }),
-    on(TravelMapAreasActions.fromSeed, (state, props): TravelMapAreasStateInternal => {
+    on(TravelMapActions.fromSeed, (state, props): TravelMapAreasStateInternal => {
       if (state.seedVersion === props.data.version) {
         return state;
       }

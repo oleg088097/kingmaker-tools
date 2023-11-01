@@ -4,30 +4,24 @@
     flex-direction: column;
     padding: 0;
 
-    > .area-edit-controls-wrapper {
+    > .controls-wrapper {
       display: flex;
       flex-direction: column;
       min-width: 400px;
       padding-left: 16px;
       padding-right: 16px;
       padding-bottom: 8px;
-      &.hide-area-edit-control {
+      &.hide-edit-control {
         height: 0;
         padding: 0;
         overflow: hidden;
-      }
-
-      > .area-edit-action-buttons {
-        display: flex;
-        gap: 10px;
-        justify-content: flex-end;
       }
     }
   }
 }
 
-.hide-area-edit-control-button,
-.show-area-edit-control-button {
+.hide-edit-control-button,
+.show-edit-control-button {
   display: flex;
   align-items: center;
   justify-content: center;

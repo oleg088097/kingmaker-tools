@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { RouterModule } from '@angular/router';
 import { StoreModule } from '@ngrx/store';
@@ -20,7 +21,9 @@ import { travelMapImageFeature } from './+state/travel-map-image.state';
 import { travelMapMeshFeature } from './+state/travel-map-mesh.state';
 import { travelMapObjectsFeature } from './+state/travel-map-objects.state';
 import { ContextMenuComponent } from './context-menu/context-menu.component';
-import { AreaEditControlComponent } from './map-controls-overlay/area-edit-control/area-edit-control.component';
+import { AreaEditControlComponent } from './map-controls-overlay/edit-control/area-edit-control/area-edit-control.component';
+import { EditControlComponent } from './map-controls-overlay/edit-control/edit-control.component';
+import { ObjectEditControlComponent } from './map-controls-overlay/edit-control/object-edit-control/object-edit-control.component';
 import { GlobalDisplayControlComponent } from './map-controls-overlay/global-display-control/global-display-control.component';
 import { MapControlsOverlayComponent } from './map-controls-overlay/map-controls-overlay.component';
 import { ScaleControlComponent } from './map-controls-overlay/scale-control/scale-control.component';
@@ -55,6 +58,8 @@ import { TravelMapComponent } from './travel-map/travel-map.component';
     MapSimpleOverlayComponent,
     MapAreaEditingOverlayDirective,
     MapObjectEditingOverlayDirective,
+    EditControlComponent,
+    ObjectEditControlComponent,
   ],
   imports: [
     CommonModule,
@@ -81,6 +86,7 @@ import { TravelMapComponent } from './travel-map/travel-map.component';
     MatListModule,
     MatInputModule,
     NgxColorsModule,
+    MatSelectModule,
   ],
   providers: [
     AreaEditorPluginService,

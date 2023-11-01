@@ -3,6 +3,7 @@
   "objects": {
     "olegTradingPost": {
       "id": "olegTradingPost",
+      "title": "olegTradingPost",
       "color": "#000000",
       "hidden": false,
       "icon": "img-castle",

@@ -1,13 +1,6 @@
-import { createActionGroup, createFeature, createReducer, on, props } from '@ngrx/store';
-import { type TravelMapData } from '../interfaces/travel-map-data';
+import { createFeature, createReducer, on } from '@ngrx/store';
+import { TravelMapActions } from './+module-state';
 import { type VersionedState } from './versioned-state';
-
-export const TravelMapImageActions = createActionGroup({
-  source: 'Travel Map Image',
-  events: {
-    fromSeed: props<{ data: TravelMapData }>(),
-  },
-});
 
 export interface TravelMapImageState {
   image: {
@@ -33,7 +26,7 @@ export const travelMapImageFeature = createFeature({
   name: 'TravelMapImage',
   reducer: createReducer(
     initialState,
-    on(TravelMapImageActions.fromSeed, (state, props): TravelMapImageStateInternal => {
+    on(TravelMapActions.fromSeed, (state, props): TravelMapImageStateInternal => {
       if (state.seedVersion === props.data.version) {
         return state;
       }

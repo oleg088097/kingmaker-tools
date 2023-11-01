@@ -4,8 +4,8 @@ import { AreaRendererService } from './renderers/area-renderer.service';
 import { MeshRendererService } from './renderers/mesh-renderer.service';
 import { ObjectEditRendererService } from './renderers/object-edit-renderer.service';
 import { ObjectRendererService } from './renderers/object-renderer.service';
+import { type Renderer } from './renderers/renderer';
 
-// TODO refactor methods to remove duplicated Code
 @Injectable()
 export class CanvasElementsGetterService {
   private readonly meshRendererService: MeshRendererService = inject(MeshRendererService);
@@ -14,57 +14,35 @@ export class CanvasElementsGetterService {
   private readonly objectEditRendererService: ObjectEditRendererService = inject(ObjectEditRendererService);
 
   public getMeshElementFromEvent(event: MouseEvent): string | undefined {
-    const elements = document.elementsFromPoint(event.x, event.y);
-    const context: CanvasRenderingContext2D | null = (
-      elements.find(
-        (element) => element.attributes.getNamedItem('data-overlay-type')?.value === OVERLAY_TYPE.MESH,
-      ) as HTMLCanvasElement
-    )?.getContext('2d');
-    if (context == null) {
-      return;
-    }
-    return this.meshRendererService.getCoordsElements(event.offsetX, event.offsetY, context).pop();
+    return this.getMeshElementsFromEvent(event, OVERLAY_TYPE.MESH, this.meshRendererService).pop();
   }
 
   public getAreaElementsFromEvent(event: MouseEvent): string[] {
-    const elements = document.elementsFromPoint(event.x, event.y);
-    const context: CanvasRenderingContext2D | null = (
-      elements.find(
-        (element) => element.attributes.getNamedItem('data-overlay-type')?.value === OVERLAY_TYPE.AREA,
-      ) as HTMLCanvasElement
-    )?.getContext('2d');
-    if (context == null) {
-      return [];
-    }
-    const areaIds = this.areaRendererService.getCoordsElements(event.offsetX, event.offsetY, context);
-    return areaIds;
+    return this.getMeshElementsFromEvent(event, OVERLAY_TYPE.AREA, this.areaRendererService);
   }
 
   public getObjectElementsFromEvent(event: MouseEvent): string[] {
-    const elements = document.elementsFromPoint(event.x, event.y);
-    const context: CanvasRenderingContext2D | null = (
-      elements.find(
-        (element) => element.attributes.getNamedItem('data-overlay-type')?.value === OVERLAY_TYPE.OBJECT,
-      ) as HTMLCanvasElement
-    )?.getContext('2d');
-    if (context == null) {
-      return [];
-    }
-    const objectIds = this.objectRendererService.getCoordsElements(event.offsetX, event.offsetY, context);
-    return objectIds;
+    return this.getMeshElementsFromEvent(event, OVERLAY_TYPE.OBJECT, this.objectRendererService);
   }
 
   public getEditObjectElementFromEvent(event: MouseEvent): string[] {
+    return this.getMeshElementsFromEvent(event, OVERLAY_TYPE.OBJECT_EDIT, this.objectEditRendererService);
+  }
+
+  private getMeshElementsFromEvent(
+    event: MouseEvent,
+    overlayType: OVERLAY_TYPE,
+    renderer: Renderer,
+  ): string[] {
     const elements = document.elementsFromPoint(event.x, event.y);
     const context: CanvasRenderingContext2D | null = (
       elements.find(
-        (element) => element.attributes.getNamedItem('data-overlay-type')?.value === OVERLAY_TYPE.OBJECT_EDIT,
+        (element) => element.attributes.getNamedItem('data-overlay-type')?.value === overlayType,
       ) as HTMLCanvasElement
     )?.getContext('2d');
     if (context == null) {
       return [];
     }
-    const objectIds = this.objectEditRendererService.getCoordsElements(event.offsetX, event.offsetY, context);
-    return objectIds;
+    return renderer.getCoordsElements(event.offsetX, event.offsetY, context);
   }
 }

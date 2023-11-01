@@ -12,11 +12,7 @@ import {
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { takeUntil } from 'rxjs';
-import { type TravelMapModuleState } from '../+state/+module-state';
-import { TravelMapAreasActions } from '../+state/travel-map-area.state';
-import { TravelMapImageActions } from '../+state/travel-map-image.state';
-import { TravelMapMeshActions } from '../+state/travel-map-mesh.state';
-import { TravelMapObjectsActions } from '../+state/travel-map-objects.state';
+import { TravelMapActions, type TravelMapModuleState } from '../+state/+module-state';
 import { DestroyService } from '../../utils/destroy.service';
 import { OVERLAY_TYPE } from '../constants/overlay-type';
 import {
@@ -59,20 +55,13 @@ export class TravelMapComponent {
       .get<TravelMapData>('/assets/data/travel-map-elements.json')
       .pipe(takeUntil(this.destroy$))
       .subscribe((data) => {
-        // TODO replace with single action
-        this.store.dispatch(TravelMapImageActions.fromSeed({ data }));
-        this.store.dispatch(TravelMapMeshActions.fromSeed({ data }));
-        this.store.dispatch(TravelMapAreasActions.fromSeed({ data }));
-        this.store.dispatch(TravelMapObjectsActions.fromSeed({ data }));
+        this.store.dispatch(TravelMapActions.fromSeed({ data }));
         this.loading.set(false);
       });
   }
 
   protected openContextMenu(event: MouseEvent): void {
     const meshId = this.canvasElementsGetterService.getMeshElementFromEvent(event);
-    if (meshId === undefined) {
-      return;
-    }
     const areaIds = this.canvasElementsGetterService.getAreaElementsFromEvent(event);
     const objectIds = this.canvasElementsGetterService.getObjectElementsFromEvent(event);
     event.preventDefault();

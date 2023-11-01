@@ -1,20 +1,14 @@
 import { createActionGroup, createFeature, createReducer, on, props } from '@ngrx/store';
 import { cloneDeep } from 'lodash';
 import { type MeshElementState } from '../interfaces/mesh-element-state';
-import {
-  AXIS,
-  MESH_TYPE,
-  ROW_TYPE,
-  type MeshProperties,
-  type TravelMapData,
-} from '../interfaces/travel-map-data';
+import { AXIS, MESH_TYPE, ROW_TYPE, type MeshProperties } from '../interfaces/travel-map-data';
 import { convertCoordinatesToMeshId } from '../utils/mesh-id-converter';
+import { TravelMapActions } from './+module-state';
 import { type VersionedState } from './versioned-state';
 
 export const TravelMapMeshActions = createActionGroup({
   source: 'Travel Map Mesh',
   events: {
-    fromSeed: props<{ data: TravelMapData }>(),
     upsertMeshElement: props<{ value: MeshElementState }>(),
   },
 });
@@ -53,7 +47,7 @@ export const travelMapMeshFeature = createFeature({
   name: 'TravelMapMesh',
   reducer: createReducer(
     initialState,
-    on(TravelMapMeshActions.fromSeed, (state, props): TravelMapMeshStateInternal => {
+    on(TravelMapActions.fromSeed, (state, props): TravelMapMeshStateInternal => {
       if (state.seedVersion === props.data.version) {
         return state;
       }
