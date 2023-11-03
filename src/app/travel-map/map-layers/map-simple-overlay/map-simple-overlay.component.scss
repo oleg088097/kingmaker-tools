@@ -8,3 +8,7 @@
 canvas {
   z-index: var(--simple-overlay-z-index);
 }
+
+.pointer-events-none {
+  pointer-events: none;
+}

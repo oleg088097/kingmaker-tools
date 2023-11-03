@@ -3,29 +3,19 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { Subject, takeUntil } from 'rxjs';
 import { type TravelMapModuleState } from '../../+state/+module-state';
-import { travelMapMeshFeature, type TravelMapMeshState } from '../../+state/travel-map-mesh.state';
 import { travelMapObjectsFeature } from '../../+state/travel-map-objects.state';
 import { type MapObjectState } from '../../interfaces/map-object-state';
 import { MapIconRegistryService } from '../map-icon-registry.service';
 import { ObjectCoordsCalculatorService } from '../object-coords-calculator.service';
-import { MeshRendererService } from './mesh-renderer.service';
 import { type Renderer } from './renderer';
 
 @Injectable()
 export class ObjectRendererService implements Renderer, OnDestroy {
   private readonly destroy$ = new Subject<void>();
-  private readonly meshService: MeshRendererService = inject(MeshRendererService);
   private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   private readonly iconRegistry: MapIconRegistryService = inject(MapIconRegistryService);
   private readonly objectCoordsCalculatorService: ObjectCoordsCalculatorService = inject(
     ObjectCoordsCalculatorService,
-  );
-
-  private readonly meshState: Signal<TravelMapMeshState> = toSignal(
-    this.store.select(travelMapMeshFeature.name),
-    {
-      requireSync: true,
-    },
   );
 
   public ngOnDestroy(): void {

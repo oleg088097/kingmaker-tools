@@ -34,12 +34,8 @@ export class CanvasElementsGetterService {
     overlayType: OVERLAY_TYPE,
     renderer: Renderer,
   ): string[] {
-    const elements = document.elementsFromPoint(event.x, event.y);
-    const context: CanvasRenderingContext2D | null = (
-      elements.find(
-        (element) => element.attributes.getNamedItem('data-overlay-type')?.value === overlayType,
-      ) as HTMLCanvasElement
-    )?.getContext('2d');
+    const element = document.querySelector(`canvas[data-overlay-type=${overlayType}]`);
+    const context: CanvasRenderingContext2D | null = (element as HTMLCanvasElement)?.getContext('2d');
     if (context == null) {
       return [];
     }

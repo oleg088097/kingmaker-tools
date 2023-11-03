@@ -38,12 +38,10 @@ export class AreaEditorPluginService implements CanvasManagerPlugin, OnDestroy {
       .pipe(
         switchMap(([editAreaState, canvasElement]) => {
           if (editAreaState != null && canvasElement != null) {
-            canvasElement?.removeAttribute('style');
             return fromEvent<MouseEvent>(canvasElement, 'mousedown').pipe(
               takeUntil(merge(this.detach$, this.destroyDownListener$)),
             );
           } else {
-            canvasElement?.setAttribute('style', 'pointer-events:none;');
             this.destroyDownListener$.next();
             return EMPTY;
           }

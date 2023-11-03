@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, Input, ViewChild, inject, type ElementRef } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  ViewChild,
+  inject,
+  signal,
+  type ElementRef,
+  type WritableSignal,
+} from '@angular/core';
 import { type OVERLAY_TYPE } from '../../constants/overlay-type';
 import {
   CanvasManagerProviderService,
@@ -23,6 +32,12 @@ export class MapSimpleOverlayComponent {
     this._overlayType = overlayType;
     const renderer = this.rendererProviderService.getRendererByOverlayType(overlayType);
     this._canvasManager.setRenderer(renderer);
+  }
+
+  protected readonly _isPointerEventsTarget: WritableSignal<boolean> = signal(true);
+
+  public setIsPointerEventsTarget(isPointerEventsTarget: boolean): void {
+    this._isPointerEventsTarget.set(isPointerEventsTarget);
   }
 
   protected _overlayType!: OVERLAY_TYPE;

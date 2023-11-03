@@ -43,13 +43,10 @@ export class ObjectEditorPluginService implements CanvasManagerPlugin, OnDestroy
       .pipe(
         switchMap(([editObjectState, canvasElement]) => {
           if (editObjectState != null && canvasElement != null) {
-            canvasElement?.removeAttribute('style');
             return fromEvent<MouseEvent>(canvasElement, 'mousedown').pipe(
               takeUntil(merge(this.detach$, this.destroyDownListener$)),
             );
           } else {
-            //
-            canvasElement?.setAttribute('style', 'pointer-events:none;');
             this.destroyDownListener$.next();
             return EMPTY;
           }

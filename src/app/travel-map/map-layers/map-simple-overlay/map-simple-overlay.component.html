@@ -1,2 +1,7 @@
 <ng-content />
-<canvas class="map-canvas" [attr.data-overlay-type]="_overlayType" #canvasElement></canvas>
+<canvas
+  class="map-canvas"
+  [class.pointer-events-none]="!_isPointerEventsTarget()"
+  [attr.data-overlay-type]="_overlayType"
+  #canvasElement
+></canvas>
