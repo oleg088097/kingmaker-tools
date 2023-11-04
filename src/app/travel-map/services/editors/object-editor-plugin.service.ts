@@ -62,6 +62,7 @@ export class ObjectEditorPluginService implements CanvasManagerPlugin, OnDestroy
 
   public ngOnDestroy(): void {
     this.detach();
+    this.destroy$.next();
   }
 
   private registerMouseListener(mouseDownEvent: MouseEvent): void {
@@ -96,8 +97,6 @@ export class ObjectEditorPluginService implements CanvasManagerPlugin, OnDestroy
   }
 
   private updateObjectPosition(mouseMoveEvent: MouseEvent): void {
-    // TODO take into account initial position of the pointer relative to icon's top-left corner
-    // and decrement updated icon position by this offset
     const editObjectState = this.editObjectState();
     if (editObjectState == null) {
       return;
