@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { from, takeUntil } from 'rxjs';
 import { GlobalActions } from './+state/global.actions';
@@ -9,6 +9,7 @@ import { DestroyService } from './utils/destroy.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   providers: [DestroyService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
   protected store = inject(Store);
