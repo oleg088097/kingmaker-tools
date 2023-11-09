@@ -1,21 +1,13 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  inject,
-  untracked,
-  type Signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, type Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { isEqual } from 'lodash';
-import { distinctUntilChanged, first, map, startWith, takeUntil } from 'rxjs';
+import { distinctUntilChanged, filter, first, map, startWith, takeUntil } from 'rxjs';
 import { type TravelMapModuleState } from '../../../+state/+module-state';
 import { TravelMapAreasActions, travelMapAreasFeature } from '../../../+state/travel-map-area.state';
 import { DestroyService } from '../../../../utils/destroy.service';
-import { type MapAreaState } from '../../../interfaces/map-area-state';
+import { type MapAreaEditState, type MapAreaState } from '../../../interfaces/map-area-state';
 
 @Component({
   selector: 'app-area-edit-control',
@@ -28,7 +20,7 @@ export class AreaEditControlComponent {
   private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   private readonly destroy$ = inject(DestroyService);
 
-  protected readonly editAreaState: Signal<Partial<MapAreaState> | null> = toSignal(
+  protected readonly editAreaState: Signal<MapAreaEditState | null> = toSignal(
     this.store.select(travelMapAreasFeature.selectEditArea),
     {
       requireSync: true,
@@ -62,17 +54,18 @@ export class AreaEditControlComponent {
   );
 
   public constructor() {
-    effect(() => {
-      const editAreaState = this.editAreaState();
-      if (editAreaState != null) {
-        untracked(() => {
-          this.areaForm.setValue({
-            title: editAreaState.title ?? '',
-            color: editAreaState.color ?? `#${Math.floor(Math.random() * 16777215).toString(16)}`,
-          });
+    this.store
+      .select(travelMapAreasFeature.selectEditArea)
+      .pipe(
+        filter((editAreaState): editAreaState is MapAreaEditState => Boolean(editAreaState)),
+        takeUntil(this.destroy$),
+      )
+      .subscribe((editAreaState) => {
+        this.areaForm.setValue({
+          title: editAreaState.title,
+          color: editAreaState.color,
         });
-      }
-    });
+      });
 
     this.areaForm.valueChanges
       .pipe(
@@ -80,14 +73,17 @@ export class AreaEditControlComponent {
         takeUntil(this.destroy$),
       )
       .subscribe((editAreaForm) => {
-        this.store.dispatch(
-          TravelMapAreasActions.updateEditArea({
-            value: {
-              ...this.editAreaState(),
-              ...editAreaForm,
-            },
-          }),
-        );
+        const editAreaState = this.editAreaState();
+        if (editAreaState !== null) {
+          this.store.dispatch(
+            TravelMapAreasActions.updateEditArea({
+              value: {
+                ...editAreaState,
+                ...editAreaForm,
+              },
+            }),
+          );
+        }
       });
   }
 

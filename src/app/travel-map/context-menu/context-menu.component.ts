@@ -9,12 +9,12 @@ import { TravelMapAreasActions, travelMapAreasFeature } from '../+state/travel-m
 import { TravelMapMeshActions, travelMapMeshFeature } from '../+state/travel-map-mesh.state';
 import { TravelMapObjectsActions, travelMapObjectsFeature } from '../+state/travel-map-objects.state';
 import { DestroyService } from '../../utils/destroy.service';
-import { DEFAULT_OBJECT_FILL_COLOR } from '../constants/default-color';
 import { DEFAULT_OBJECT_ICON } from '../constants/default-object-icon';
-import { type MapAreaState } from '../interfaces/map-area-state';
+import { type MapAreaEditState, type MapAreaState } from '../interfaces/map-area-state';
 import { ICON_TYPE, type MapObjectEditState, type MapObjectState } from '../interfaces/map-object-state';
 import { type MeshElementState } from '../interfaces/mesh-element-state';
 import { MeshRelativeCoordsCalcService } from '../services/mesh-relative-coords-calc.service';
+import { getRandomColor } from '../utils/color.utils';
 
 export interface ContextMenuData {
   meshId?: string;
@@ -68,7 +68,7 @@ export class ContextMenuComponent {
     { requireSync: true },
   );
 
-  protected editAreaState: Signal<Partial<MapAreaState> | null> = toSignal(
+  protected editAreaState: Signal<MapAreaEditState | null> = toSignal(
     this.store.select(travelMapAreasFeature.selectEditArea),
     {
       requireSync: true,
@@ -94,7 +94,7 @@ export class ContextMenuComponent {
     this.overlayRef.dispose();
   }
 
-  protected editArea(area: Partial<MapAreaState>): void {
+  protected editArea(area: MapAreaEditState): void {
     this.store.dispatch(
       TravelMapAreasActions.updateEditArea({
         value: {
@@ -120,9 +120,13 @@ export class ContextMenuComponent {
     this.overlayRef.dispose();
   }
 
-  protected getEmptyAreaState(): Partial<MapAreaState> {
+  protected getEmptyAreaState(): MapAreaEditState {
     return {
       id: uuidv4(),
+      title: '',
+      color: getRandomColor(),
+      meshElementIds: [],
+      type: '',
     };
   }
 
@@ -138,7 +142,8 @@ export class ContextMenuComponent {
     }
     return {
       id: uuidv4(),
-      color: DEFAULT_OBJECT_FILL_COLOR,
+      title: '',
+      color: getRandomColor(),
       icon: DEFAULT_OBJECT_ICON,
       type: ICON_TYPE.default,
       meshElementId: mesh.id,

@@ -1,11 +1,13 @@
-export interface MapAreaState {
-  id: string;
+export interface MapAreaEditState {
+  id?: string;
   title: string;
-  comment: string;
+  comment?: string;
   meshElementIds: string[];
   type: string;
   color: string;
-  groups: unknown[];
-  hidden: boolean;
+  groups?: unknown[];
+}
+
+export interface MapAreaState extends Required<MapAreaEditState> {
   inEdit?: boolean;
 }

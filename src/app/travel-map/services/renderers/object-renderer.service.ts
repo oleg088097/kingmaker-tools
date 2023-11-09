@@ -40,7 +40,7 @@ export class ObjectRendererService implements Renderer, OnDestroy {
   public render(ctx: CanvasRenderingContext2D): void {
     const objectsState = this.objectsState();
     for (const object of Object.values(objectsState)) {
-      if (object.hidden || object.inEdit === true) {
+      if (object.inEdit === true) {
         continue;
       }
       this.iconRegistry

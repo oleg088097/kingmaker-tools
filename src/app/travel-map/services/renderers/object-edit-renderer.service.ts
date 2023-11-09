@@ -4,7 +4,6 @@ import { Store } from '@ngrx/store';
 import { Subject, takeUntil } from 'rxjs';
 import { type TravelMapModuleState } from '../../+state/+module-state';
 import { travelMapObjectsFeature } from '../../+state/travel-map-objects.state';
-import { DEFAULT_OBJECT_FILL_COLOR } from '../../constants/default-color';
 import { type MapObjectEditState } from '../../interfaces/map-object-state';
 import { MapIconRegistryService } from '../map-icon-registry.service';
 import { ObjectCoordsCalculatorService } from '../object-coords-calculator.service';
@@ -85,7 +84,7 @@ export class ObjectEditRendererService implements Renderer, OnDestroy {
     const render = this.editObjectRender;
     if (render != null) {
       ctx.save();
-      ctx.fillStyle = editObjectState.color ?? DEFAULT_OBJECT_FILL_COLOR;
+      ctx.fillStyle = editObjectState.color;
       ctx.fill(render.path);
       ctx.restore();
     }

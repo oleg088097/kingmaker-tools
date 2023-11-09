@@ -1,7 +1,7 @@
 import { createActionGroup, createFeature, createReducer, on, props } from '@ngrx/store';
 import { cloneDeep } from 'lodash';
 import { GlobalActions, UPDATE_ACTION_CREATOR } from '../../+state/global.actions';
-import { type MapAreaState } from '../interfaces/map-area-state';
+import { type MapAreaEditState, type MapAreaState } from '../interfaces/map-area-state';
 import { TravelMapActions } from './+module-state';
 import { type VersionedState } from './versioned-state';
 
@@ -9,13 +9,13 @@ export const TravelMapAreasActions = createActionGroup({
   source: 'Travel Map Areas',
   events: {
     upsertArea: props<{ value: MapAreaState }>(),
-    updateEditArea: props<{ value: Partial<MapAreaState> | null }>(),
+    updateEditArea: props<{ value: MapAreaEditState | null }>(),
   },
 });
 
 export interface TravelMapAreasState {
   areas: Record<string, MapAreaState>;
-  editArea: Partial<MapAreaState> | null;
+  editArea: MapAreaEditState | null;
 }
 
 type TravelMapAreasStateInternal = TravelMapAreasState & VersionedState;

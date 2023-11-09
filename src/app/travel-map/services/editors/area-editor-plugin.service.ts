@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { EMPTY, Subject, combineLatest, first, fromEvent, merge, switchMap, takeUntil } from 'rxjs';
 import { type TravelMapModuleState } from '../../+state/+module-state';
 import { TravelMapAreasActions, travelMapAreasFeature } from '../../+state/travel-map-area.state';
-import { type MapAreaState } from '../../interfaces/map-area-state';
+import { type MapAreaEditState } from '../../interfaces/map-area-state';
 import { CanvasElementsGetterService } from '../canvas-elements-getter.service';
 import { type CanvasManagerPlugin } from '../canvas-manager-provider.service';
 
@@ -18,7 +18,7 @@ export class AreaEditorPluginService implements CanvasManagerPlugin, OnDestroy {
   private readonly mouseMoveMeshIds: Set<string> = new Set<string>();
   private readonly destroyMoveUpListeners$: Subject<void> = new Subject<void>();
   private readonly destroyDownListener$: Subject<void> = new Subject<void>();
-  private readonly editAreaState: Signal<Partial<MapAreaState> | null> = toSignal(
+  private readonly editAreaState: Signal<MapAreaEditState | null> = toSignal(
     this.store.select(travelMapAreasFeature.selectEditArea),
     {
       requireSync: true,
@@ -74,7 +74,7 @@ export class AreaEditorPluginService implements CanvasManagerPlugin, OnDestroy {
     this.areaEditingHandler(meshId);
   }
 
-  private getMeshIndexInAreaMeshElements(editAreaState: Partial<MapAreaState>, meshId: string): number {
+  private getMeshIndexInAreaMeshElements(editAreaState: MapAreaEditState, meshId: string): number {
     return editAreaState.meshElementIds?.findIndex((id) => id === meshId) ?? -1;
   }
 

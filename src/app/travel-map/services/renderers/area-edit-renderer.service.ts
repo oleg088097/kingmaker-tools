@@ -5,7 +5,7 @@ import { type TravelMapModuleState } from '../../+state/+module-state';
 import { travelMapAreasFeature } from '../../+state/travel-map-area.state';
 import { travelMapMeshFeature, type TravelMapMeshState } from '../../+state/travel-map-mesh.state';
 import { DEFAULT_AREA_FILL_COLOR } from '../../constants/default-color';
-import { type MapAreaState } from '../../interfaces/map-area-state';
+import { type MapAreaEditState } from '../../interfaces/map-area-state';
 import { type MeshTileRender } from '../mesh-adapters/mesh-adapter-strategy';
 import { MeshRendererService } from './mesh-renderer.service';
 import { type Renderer } from './renderer';
@@ -22,7 +22,7 @@ export class AreaEditRendererService implements Renderer {
     },
   );
 
-  private readonly editAreaState: Signal<Partial<MapAreaState> | null> = toSignal(
+  private readonly editAreaState: Signal<MapAreaEditState | null> = toSignal(
     this.store.select(travelMapAreasFeature.selectEditArea),
     {
       requireSync: true,
@@ -46,7 +46,7 @@ export class AreaEditRendererService implements Renderer {
     const areaMeshTiles: MeshTileRender[] = [];
     for (const meshElement of Object.values(meshState.meshMap)) {
       const meshRender = this.meshService.getMeshTileRender(meshElement.id) as MeshTileRender;
-      if (editAreaState.meshElementIds?.includes(meshElement.id) === true) {
+      if (editAreaState.meshElementIds?.includes(meshElement.id)) {
         areaMeshTiles.push(meshRender);
       } else {
         this.redrawAvailableForSelectionTile(meshRender, ctx);
@@ -77,7 +77,7 @@ export class AreaEditRendererService implements Renderer {
     return [];
   }
 
-  private redrawEditArea(area: Partial<MapAreaState> | null, ctx: CanvasRenderingContext2D): void {
+  private redrawEditArea(area: MapAreaEditState | null, ctx: CanvasRenderingContext2D): void {
     if (this.editAreaRender != null) {
       ctx.save();
       ctx.globalAlpha = 0.5;

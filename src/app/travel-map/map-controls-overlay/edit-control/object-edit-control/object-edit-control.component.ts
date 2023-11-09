@@ -1,17 +1,9 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  inject,
-  untracked,
-  type Signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, type Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { isEqual } from 'lodash';
-import { distinctUntilChanged, first, map, startWith, switchMap, takeUntil } from 'rxjs';
+import { distinctUntilChanged, filter, first, map, startWith, switchMap, takeUntil } from 'rxjs';
 import { type TravelMapModuleState } from '../../../+state/+module-state';
 import { TravelMapObjectsActions, travelMapObjectsFeature } from '../../../+state/travel-map-objects.state';
 import { DestroyService } from '../../../../utils/destroy.service';
@@ -85,19 +77,20 @@ export class ObjectEditControlComponent {
   protected readonly isObjectNotValid: Signal<boolean> = computed(() => !this.isFormValid());
 
   public constructor() {
-    effect(() => {
-      const editObjectState = this.editObjectState();
-      if (editObjectState != null) {
-        untracked(() => {
-          this.objectForm.setValue({
-            title: editObjectState.title ?? '',
-            color: editObjectState.color ?? `#${Math.floor(Math.random() * 16777215).toString(16)}`,
-            type: editObjectState.type ?? ICON_TYPE.default,
-            icon: editObjectState.icon ?? DEFAULT_OBJECT_ICON,
-          });
+    this.store
+      .select(travelMapObjectsFeature.selectEditObject)
+      .pipe(
+        filter((editObjectState): editObjectState is MapObjectEditState => Boolean(editObjectState)),
+        takeUntil(this.destroy$),
+      )
+      .subscribe((editObjectState) => {
+        this.objectForm.setValue({
+          title: editObjectState.title,
+          color: editObjectState.color,
+          type: editObjectState.type,
+          icon: editObjectState.icon,
         });
-      }
-    });
+      });
 
     this.objectForm.valueChanges
       .pipe(

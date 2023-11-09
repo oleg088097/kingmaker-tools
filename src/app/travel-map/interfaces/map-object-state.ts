@@ -6,7 +6,7 @@ export enum ICON_TYPE {
 
 export interface MapObjectEditState {
   id?: string;
-  title?: string;
+  title: string;
   meshElementId: string;
   meshElementCenterRelativeX: number;
   meshElementCenterRelativeY: number;
@@ -17,6 +17,5 @@ export interface MapObjectEditState {
 }
 
 export interface MapObjectState extends Required<MapObjectEditState> {
-  hidden: boolean;
   inEdit?: boolean;
 }

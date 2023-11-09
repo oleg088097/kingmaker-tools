@@ -12,7 +12,8 @@ import { type TravelMapModuleState } from '../../+state/+module-state';
 import { travelMapAreasFeature } from '../../+state/travel-map-area.state';
 import { travelMapObjectsFeature } from '../../+state/travel-map-objects.state';
 import { DestroyService } from '../../../utils/destroy.service';
-import { type MapAreaState } from '../../interfaces/map-area-state';
+import { type MapAreaEditState } from '../../interfaces/map-area-state';
+import { type MapObjectEditState } from '../../interfaces/map-object-state';
 
 @Component({
   selector: 'app-edit-control',
@@ -34,14 +35,14 @@ export class EditControlComponent {
   );
   */
 
-  protected readonly editAreaState: Signal<Partial<MapAreaState> | null> = toSignal(
+  protected readonly editAreaState: Signal<MapAreaEditState | null> = toSignal(
     this.store.select(travelMapAreasFeature.selectEditArea),
     {
       requireSync: true,
     },
   );
 
-  protected readonly editObjectState: Signal<Partial<MapAreaState> | null> = toSignal(
+  protected readonly editObjectState: Signal<MapObjectEditState | null> = toSignal(
     this.store.select(travelMapObjectsFeature.selectEditObject),
     {
       requireSync: true,

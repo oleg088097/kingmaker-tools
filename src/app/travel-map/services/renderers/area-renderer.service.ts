@@ -24,7 +24,7 @@ export class AreaRendererService implements Renderer {
   public render(ctx: CanvasRenderingContext2D): void {
     const areasState = this.areasState();
     for (const area of Object.values(areasState)) {
-      if (area.hidden || area.inEdit === true) {
+      if (area.inEdit === true) {
         continue;
       }
       const areaPath: Path2D = (area.meshElementIds ?? [])
