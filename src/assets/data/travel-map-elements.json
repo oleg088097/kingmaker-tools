@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "objects": {
+    "olegTradingPost": {
+      "id": "olegTradingPost",
+      "title": "olegTradingPost",
+      "color": "#000000",
+      "hidden": false,
+      "icon": "img-castle",
+      "type": "building",
+      "meshElementId": "A19",
+      "meshElementCenterRelativeX": -30,
+      "meshElementCenterRelativeY": -130
+    }
+  },
+  "areas": {
+    "greenBelt": {
+      "id": "greenBelt",
+      "title": "greenBelt",
+      "comment": "greenBelt",
+      "meshElementIds": ["A19", "A20", "A21", "B19", "B20", "B21", "C19", "C20", "C21"],
+      "type": "",
+      "color": "#008000",
+      "groups": [],
+      "hidden": false
+    }
+  },
+  "image": {
+    "width": 6450,
+    "height": 2250,
+    "url": "/assets/img/map.webp"
+  },
+  "mesh": {
+    "properties": {
+      "type": "HEX",
+      "size": 132,
+      "meshLeftOffset": 23,
+      "meshTopOffset": 203,
+      "typeData": {
+        "shift": {
+          "axis": "X",
+          "shiftType": "EVEN",
+          "truncateShifted": true
+        }
+      },
+      "dimensions": {
+        "x": 28,
+        "y": 10
+      }
+    },
+    "meshMap": {
+      "A19": {
+        "id": "A19",
+        "title": "A19",
+        "fog": false
+      },
+      "A20": {
+        "id": "A20",
+        "title": "A20",
+        "fog": false
+      },
+      "A21": {
+        "id": "A21",
+        "title": "A21",
+        "fog": false
+      },
+      "A22": {
+        "id": "A22",
+        "title": "A22",
+        "fog": false
+      },
+      "A23": {
+        "id": "A23",
+        "title": "A23",
+        "fog": false
+      },
+      "A24": {
+        "id": "A24",
+        "title": "A24",
+        "fog": false
+      },
+      "A25": {
+        "id": "A25",
+        "title": "A25",
+        "fog": false
+      },
+      "A26": {
+        "id": "A26",
+        "title": "A26",
+        "fog": false
+      },
+      "A27": {
+        "id": "A27",
+        "title": "A27",
+        "fog": false
+      }
+    }
+  }
+}

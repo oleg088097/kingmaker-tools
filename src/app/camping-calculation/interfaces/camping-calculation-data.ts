@@ -1,6 +1,6 @@
-import { CHECK_RESULT } from '../../shared/constants';
-import { CheckDescriptionWithId } from '../../shared/types';
-import { CheckDependencies } from '../../shared/types/check-dependencies';
+import { type CHECK_RESULT } from '../../shared/constants';
+import { type CheckDescriptionWithId } from '../../shared/types';
+import { type CheckDependencies } from '../../shared/types/check-dependencies';
 
 export type CheckDescriptionCamping = Omit<CheckDescriptionWithId, 'dc'> & {
   dc?: number;

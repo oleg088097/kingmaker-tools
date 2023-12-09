@@ -1,6 +1,6 @@
 import { createActionGroup, createFeature, createReducer, on, props } from '@ngrx/store';
-import { CheckDependencies } from '../../shared/types/check-dependencies';
-import { CampingCalculationData } from '../interfaces/camping-calculation-data';
+import { type CheckDependencies } from '../../shared/types/check-dependencies';
+import { type CampingCalculationData } from '../interfaces/camping-calculation-data';
 
 export const RandomEncounterCheckActions = createActionGroup({
   source: 'Random Encounter Check',

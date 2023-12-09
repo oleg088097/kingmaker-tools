@@ -1,9 +1,9 @@
 import { createActionGroup, createFeature, createReducer, on, props } from '@ngrx/store';
 import { cloneDeep } from 'lodash';
-import { CheckDependencies } from '../../shared/types/check-dependencies';
+import { type CheckDependencies } from '../../shared/types/check-dependencies';
 import {
-  CampingCalculationData,
-  CampingCalculationDataWatchCheck,
+  type CampingCalculationData,
+  type CampingCalculationDataWatchCheck,
 } from '../interfaces/camping-calculation-data';
 
 export const WatchChecksActions = createActionGroup({

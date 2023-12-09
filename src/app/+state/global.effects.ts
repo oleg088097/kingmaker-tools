@@ -11,6 +11,8 @@ interface AppStateVersioned {
 const CURRENT_STATE_VERSION = 2;
 const STATE_STORAGE_KEY = '__store_state';
 
+// For global migrations
+// specific reducer should use its version field to migrate in GlobalActions.loadStoreState handler
 function migrateState(state: AppStateVersioned): AppStateVersioned {
   switch (state.version) {
     case 1: {
@@ -22,14 +24,14 @@ function migrateState(state: AppStateVersioned): AppStateVersioned {
 
 @Injectable()
 export class GlobalEffects {
-  private actions$: Actions = inject(Actions);
-  private store: Store<Record<string, unknown>> = inject(Store);
-  private persistState: boolean = false;
+  private readonly actions$: Actions = inject(Actions);
+  private readonly store: Store<Record<string, unknown>> = inject(Store);
+  private persistState = false;
 
-  updatePersistState$ = createEffect(
+  activateStatePersistence$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(GlobalActions.activateStatePersistance),
+        ofType(GlobalActions.activateStatePersistence),
         tap(() => (this.persistState = true)),
       ),
     { dispatch: false },
@@ -41,7 +43,9 @@ export class GlobalEffects {
         filter(() => this.persistState),
         debounceTime(500),
         switchMap(() => this.store.pipe(first())),
-        tap((value: Record<string, unknown>) => saveStateToLocalStorage(value)),
+        tap((value: Record<string, unknown>) => {
+          saveStateToLocalStorage(value);
+        }),
       ),
     { dispatch: false },
   );
@@ -51,10 +55,10 @@ export class GlobalEffects {
       ofType(GlobalActions.loadStoreStateFromLocalStorage),
       map(() => {
         const globalState = loadStateFromLocalStorage();
-        if (globalState) {
+        if (globalState != null) {
           return GlobalActions.loadStoreState({ globalState: migrateState(globalState).state });
         } else {
-          return GlobalActions.activateStatePersistance();
+          return GlobalActions.activateStatePersistence();
         }
       }),
     ),
@@ -63,7 +67,7 @@ export class GlobalEffects {
   loadStoreState$ = createEffect(() =>
     this.actions$.pipe(
       ofType(GlobalActions.loadStoreState),
-      map(() => GlobalActions.activateStatePersistance()),
+      map(() => GlobalActions.activateStatePersistence()),
     ),
   );
 }
@@ -78,6 +82,7 @@ function saveStateToLocalStorage(state: Record<string, unknown>): void {
 
 function loadStateFromLocalStorage(): AppStateVersioned | null {
   const persisted = localStorage.getItem(STATE_STORAGE_KEY);
-  const parsedData: AppStateVersioned | unknown = persisted ? JSON.parse(persisted) : null;
-  return (parsedData as AppStateVersioned)?.version ? (parsedData as AppStateVersioned) : null;
+  const parsedData: AppStateVersioned | unknown =
+    persisted != null && persisted !== '' ? JSON.parse(persisted) : null;
+  return (parsedData as AppStateVersioned)?.version != null ? (parsedData as AppStateVersioned) : null;
 }

@@ -139,7 +139,7 @@
         },
         "3": {
           "modifier": -2,
-          "critSuccessRange": [19,20]
+          "critSuccessRange": [19, 20]
         }
       }
     }
@@ -148,20 +148,20 @@
     "stealthModifier": 10,
     "campingChecksDependencies": {
       "Organize Watch": {
-        "0":  {
+        "0": {
           "modifier": 1
         },
-        "1":  {
+        "1": {
           "modifier": 1
         }
       },
       "Cook Basic Meal": {
-        "3":  {
+        "3": {
           "modifier": -1
         }
       },
       "Tell Campfire Story": {
-        "3":  {
+        "3": {
           "modifier": -1
         }
       }

@@ -7,23 +7,23 @@ import {
   Input,
   Output,
   signal,
-  Signal,
-  WritableSignal,
+  type Signal,
+  type WritableSignal,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { takeUntil } from 'rxjs';
-import { CampingCalculationModuleState } from '../../+state/+module-state';
+import { type CampingCalculationModuleState } from '../../+state/+module-state';
 import {
   RandomEncounterCheckActions,
   randomEncounterCheckFeature,
-  RandomEncounterCheckState,
+  type RandomEncounterCheckState,
 } from '../../+state/random-encounter-check.state';
-import { CheckPerformerService, CheckResult } from '../../../shared/services';
+import { CheckPerformerService, type CheckResult } from '../../../shared/services';
 import { CheckDependenciesAggregatorService } from '../../../shared/services/check-dependencies-aggregator.service';
 import { DestroyService } from '../../../utils/destroy.service';
-import { CampingResultsChange } from '../camping-checks/camping-checks.component';
+import { type CampingResultsChange } from '../camping-checks/camping-checks.component';
 
 export interface RandomEncounterResultChange {
   result: CheckResult | null;
@@ -42,6 +42,7 @@ export class RandomEncounterCheckComponent {
     this.checkOutdated.set(true);
     this._campingResults = campingResults;
   }
+
   @Output() resultsChange: EventEmitter<RandomEncounterResultChange> =
     new EventEmitter<RandomEncounterResultChange>();
 
@@ -50,6 +51,7 @@ export class RandomEncounterCheckComponent {
     nonNullable: true,
     validators: Validators.required,
   });
+
   protected checkResult: WritableSignal<CheckResult | undefined> = signal(undefined);
   protected checkOutdated: WritableSignal<boolean> = signal(false);
   protected store: Store<CampingCalculationModuleState> = inject(Store);
@@ -62,10 +64,12 @@ export class RandomEncounterCheckComponent {
       },
     },
   );
-  private skillCheckPerformerService: CheckPerformerService = inject(CheckPerformerService);
-  private checkDependenciesAggregatorService: CheckDependenciesAggregatorService = inject(
+
+  private readonly skillCheckPerformerService: CheckPerformerService = inject(CheckPerformerService);
+  private readonly checkDependenciesAggregatorService: CheckDependenciesAggregatorService = inject(
     CheckDependenciesAggregatorService,
   );
+
   private _campingResults: CampingResultsChange | null = null;
 
   constructor() {

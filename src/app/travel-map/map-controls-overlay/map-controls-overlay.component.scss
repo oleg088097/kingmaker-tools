@@ -1,0 +1,26 @@
+:host {
+  overflow: auto;
+}
+
+.map-control-overlay {
+  z-index: var(--kt-control-overlay-z-index);
+}
+
+.scale-control {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+}
+
+.global-display-control {
+  position: fixed;
+  top: 70px;
+  left: 0;
+}
+
+.edit-control {
+  position: fixed;
+  top: 0;
+  left: 50vw;
+  transform: translateX(-50%);
+}

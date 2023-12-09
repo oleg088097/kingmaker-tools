@@ -1,0 +1,27 @@
+<mat-card class="global-display-control map-control-overlay">
+  <mat-card-content>
+    <div class="controls-wrapper" [class.hide-display-control]="isHideDisplayControls()">
+      <mat-slide-toggle
+        [formControl]="travelMapDisplaySettingsStateForm.controls.isMeshElementTitleDisplayed"
+      >
+        Номера клеток
+      </mat-slide-toggle>
+      <mat-slide-toggle [formControl]="travelMapDisplaySettingsStateForm.controls.isFogDisplayed">
+        Туман
+      </mat-slide-toggle>
+    </div>
+
+    <div
+      class="hide-display-control-button"
+      (click)="isHideDisplayControls.set(true)"
+      *ngIf="!isHideDisplayControls(); else showDisplayControlsButton"
+    >
+      <mat-icon>arrow_back_ios_new</mat-icon>
+    </div>
+    <ng-template #showDisplayControlsButton>
+      <div class="show-display-control-button" (click)="isHideDisplayControls.set(false)">
+        <mat-icon>arrow_forward_ios_new</mat-icon>
+      </div>
+    </ng-template>
+  </mat-card-content>
+</mat-card>

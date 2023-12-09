@@ -17,6 +17,31 @@ div.mdc-text-field {
   padding: 0 8px;
 }
 
+.flex {
+  display: flex;
+}
+
+.flex-gap-10 {
+  gap: 10px;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.map-canvas {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.margin-0,
+.mat-typography .margin-0 {
+  margin: 0;
+}
+
 .square-100 {
   width: 100%;
   height: 100%;

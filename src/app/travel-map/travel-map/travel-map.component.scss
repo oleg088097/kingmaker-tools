@@ -1,0 +1,31 @@
+:host {
+  --kt-control-overlay-z-index: calc(var(--kt-header-z-index) + 5);
+  --kt-object-edit-overlay-z-index: calc(var(--kt-header-z-index) - 5);
+  --kt-area-edit-overlay-z-index: calc(var(--kt-object-edit-overlay-z-index) - 1);
+  --kt-object-overlay-z-index: calc(var(--kt-area-edit-overlay-z-index) - 5);
+  --kt-area-overlay-z-index: calc(var(--kt-object-overlay-z-index) - 1);
+  --kt-mesh-overlay-z-index: calc(var(--kt-area-overlay-z-index) - 1);
+  display: block;
+  width: fit-content;
+  height: fit-content;
+}
+
+.mesh-overlay {
+  --simple-overlay-z-index: var(--kt-mesh-overlay-z-index);
+}
+
+.area-overlay {
+  --simple-overlay-z-index: var(--kt-area-overlay-z-index);
+}
+
+.area-edit-overlay {
+  --simple-overlay-z-index: var(--kt-area-edit-overlay-z-index);
+}
+
+.object-overlay {
+  --simple-overlay-z-index: var(--kt-object-overlay-z-index);
+}
+
+.object-edit-overlay {
+  --simple-overlay-z-index: var(--kt-object-edit-overlay-z-index);
+}

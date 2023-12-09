@@ -1,0 +1,54 @@
+<mat-form-field>
+  <mat-label>Название объекта</mat-label>
+  <input matInput placeholder="Название объекта" [formControl]="objectForm.controls.title" />
+</mat-form-field>
+<mat-form-field>
+  <mat-label>Цвет</mat-label>
+  <input matInput [formControl]="objectForm.controls.color" />
+  <ngx-colors
+    matSuffix
+    ngx-colors-trigger
+    style="display: inline-block; margin: 5px"
+    [formControl]="objectForm.controls.color"
+  ></ngx-colors>
+</mat-form-field>
+<mat-form-field>
+  <mat-label>Тип</mat-label>
+  <mat-select [formControl]="objectForm.controls.type">
+    <mat-option *ngFor="let type of iconTypes | keyvalue" [value]="type.key">
+      {{ type.value }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+<mat-form-field>
+  <mat-label>Иконка</mat-label>
+  <mat-select [formControl]="objectForm.controls.icon">
+    <ng-container *ngIf="iconRegistry() as registry; else spinner">
+      <mat-option *ngFor="let type of registry | keyvalue" [value]="type.key">
+        <span class="icon-option">
+          <svg
+            viewBox="0 0 512 512"
+            preserveAspectRatio="xMidYMid meet"
+            xmlns="http://www.w3.org/2000/svg"
+            width="30"
+            height="30"
+            [attr.fill]="objectForm.controls.color.value"
+          >
+            <path [attr.d]="type.value"></path>
+          </svg>
+          {{ type.key }}
+        </span>
+      </mat-option>
+    </ng-container>
+
+    <ng-template #spinner>
+      <mat-option [disabled]="true"><mat-spinner diameter="50"></mat-spinner></mat-option>
+    </ng-template>
+  </mat-select>
+</mat-form-field>
+<span class="object-edit-action-buttons">
+  <button mat-raised-button color="accent" (click)="cancel()">Отменить</button>
+  <button mat-raised-button color="primary" (click)="save()" [disabled]="isObjectNotValid()">
+    Сохранить
+  </button>
+</span>

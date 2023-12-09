@@ -1,0 +1,16 @@
+:host {
+  display: flex;
+  flex-direction: column;
+
+  > .object-edit-action-buttons {
+    display: flex;
+    gap: 1em;
+    justify-content: flex-end;
+  }
+}
+
+.icon-option {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}

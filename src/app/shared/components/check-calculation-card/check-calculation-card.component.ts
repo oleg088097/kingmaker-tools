@@ -6,7 +6,7 @@ import {
   Input,
   Output,
   signal,
-  WritableSignal,
+  type WritableSignal,
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,17 +16,17 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { distinctUntilChanged, merge, Observable, Subject, takeUntil } from 'rxjs';
+import { distinctUntilChanged, merge, Subject, takeUntil, type Observable } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { DestroyService } from '../../../utils/destroy.service';
-import { CheckPerformerService, CheckResult } from '../../services';
-import { CheckDescriptionWithId } from '../../types';
+import { CheckPerformerService, type CheckResult } from '../../services';
+import { type CheckDescriptionWithId } from '../../types';
 import { CheckResultComponent } from '../check-result/check-result.component';
 
-type CheckResultState = {
+interface CheckResultState {
   isResultOutdated: boolean;
   result: CheckResult | null;
-};
+}
 
 @Component({
   selector: 'app-check-calculation-card',
@@ -50,21 +50,24 @@ export class CheckCalculationCardComponent {
   @Input({ required: true }) set skillCheckFormValue(value: CheckDescriptionWithId) {
     this.skillCheckForm.setValue(value, { emitEvent: false });
   }
+
   @Input() set externalSkillCheckTrigger$(observable: Observable<void>) {
     this.externalSkillCheckDestroy$.next();
-    observable
-      .pipe(takeUntil(merge(this.externalSkillCheckDestroy$, this.destroy$)))
-      .subscribe(() => this.doCheck());
+    observable.pipe(takeUntil(merge(this.externalSkillCheckDestroy$, this.destroy$))).subscribe(() => {
+      this.doCheck();
+    });
   }
+
   @Output() formUpdate: EventEmitter<CheckDescriptionWithId> = new EventEmitter<CheckDescriptionWithId>();
   @Output() remove: EventEmitter<void> = new EventEmitter<void>();
-  private externalSkillCheckDestroy$ = new Subject<void>();
-  private destroy$ = inject(DestroyService);
+  private readonly externalSkillCheckDestroy$ = new Subject<void>();
+  private readonly destroy$ = inject(DestroyService);
   protected checkResultState: WritableSignal<CheckResultState> = signal({
     result: null,
     isResultOutdated: true,
   });
-  private skillCheckPerformerService: CheckPerformerService = inject(CheckPerformerService);
+
+  private readonly skillCheckPerformerService: CheckPerformerService = inject(CheckPerformerService);
 
   protected skillCheckForm = new FormGroup({
     id: new FormControl<string>(uuidv4(), { nonNullable: true, validators: [Validators.required] }),
@@ -82,7 +85,7 @@ export class CheckCalculationCardComponent {
       });
   }
 
-  protected doCheck() {
+  protected doCheck(): void {
     const result = this.skillCheckPerformerService.doCheck(
       this.skillCheckForm.controls.modifier.value,
       this.skillCheckForm.controls.dc.value,

@@ -1,13 +1,13 @@
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, Signal, inject } from '@angular/core';
+import { moveItemInArray, type CdkDragDrop } from '@angular/cdk/drag-drop';
+import { ChangeDetectionStrategy, Component, inject, type Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { takeUntil } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
-import { CampingCalculationModuleState } from '../../../+state/+module-state';
+import { type CampingCalculationModuleState } from '../../../+state/+module-state';
 import { WatchChecksActions, watchChecksFeature } from '../../../+state/watch-checks.state';
 import { DestroyService } from '../../../../utils/destroy.service';
-import { CampingCalculationDataWatchCheck } from '../../../interfaces/camping-calculation-data';
+import { type CampingCalculationDataWatchCheck } from '../../../interfaces/camping-calculation-data';
 
 @Component({
   selector: 'app-watch-checks-list-edit',

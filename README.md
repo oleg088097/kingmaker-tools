@@ -1,27 +1,29 @@
 # KingmakerTools
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.1.1.
+# Data Flow
 
-## Development server
+## Initial app load
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+1. Load App
+2. Load State from Local Storage
+3. Migrate State
+4. Update state in store
 
-## Code scaffolding
+## Load specific feature route
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+1. Open route
+2. Load Seed data
+3. Merge Seed/StoreState
+4. Update state in store
 
-## Build
+### If move to server-side storage
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+1. Open route
+2. Load data from Server + store server data in local storage SERVER_DATA_VAR
+3. Merge ServerData/StoreState
+4. Update state in store
+5. Upload state to server
 
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+Tricky bit: App should be able to work offline, preserve changes made offline and send it to the server once online.
+To do so, during the step 3 we check diff between StoreState/SERVER_DATA_VAR and ServerData/SERVER_DATA_VAR
+Then we apply non-conflicting changes and ask user to resolve conflicts

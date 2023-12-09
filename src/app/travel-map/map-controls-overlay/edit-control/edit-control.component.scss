@@ -1,0 +1,30 @@
+:host {
+  min-width: min(400px, 100vw);
+  > mat-card > mat-card-content {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+
+    > .controls-wrapper {
+      display: flex;
+      flex-direction: column;
+      padding-left: 16px;
+      padding-right: 16px;
+      padding-bottom: 8px;
+      &.hide-edit-control {
+        height: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+    }
+  }
+}
+
+.hide-edit-control-button,
+.show-edit-control-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-top: solid 1px var(--mat-divider-color);
+}

@@ -1,6 +1,9 @@
 import { createActionGroup, createFeature, createReducer, on, props } from '@ngrx/store';
 import { cloneDeep } from 'lodash';
-import { CampingCalculationData, CheckDescriptionCamping } from '../interfaces/camping-calculation-data';
+import {
+  type CampingCalculationData,
+  type CheckDescriptionCamping,
+} from '../interfaces/camping-calculation-data';
 
 export const CampingChecksActions = createActionGroup({
   source: 'Camping Checks',

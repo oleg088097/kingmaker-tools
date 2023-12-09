@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
-import { CheckDependencies } from '../types/check-dependencies';
-import { CheckResult } from './check-performer.service';
+import { type CheckDependencies } from '../types/check-dependencies';
+import { type CheckResult } from './check-performer.service';
 
-export type AggregatedDependenciesOptions = {
+export interface AggregatedDependenciesOptions {
   modifier: number;
   skipCheck: boolean;
   critSuccessRange: [number, number];
   critFailureRange: [number, number];
-};
+}
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +17,7 @@ export class CheckDependenciesAggregatorService {
     checkDependencies: CheckDependencies | undefined,
     dependencyResult: Map<string, CheckResult> | undefined,
   ): AggregatedDependenciesOptions {
-    if (!dependencyResult) {
+    if (dependencyResult == null) {
       return {
         skipCheck: false,
         modifier: 0,

@@ -1,3 +1,4 @@
+import { HttpClientModule } from '@angular/common/http';
 import { NgModule, isDevMode } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -7,7 +8,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { ActionReducerMap } from '@ngrx/store/src/models';
+import { type ActionReducerMap } from '@ngrx/store/src/models';
 import { GlobalEffects } from './+state/global.effects';
 import { loadStoreStateMetaReducer } from './+state/load-store-state-meta-reducer';
 import { AppRoutingModule } from './app-routing.module';
@@ -17,6 +18,8 @@ import { AppComponent } from './app.component';
   declarations: [AppComponent],
   imports: [
     BrowserModule,
+    // Needed in root for MatIconRegistry
+    HttpClientModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     StoreModule.forRoot({} satisfies ActionReducerMap<unknown>, {

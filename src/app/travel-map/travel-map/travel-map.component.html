@@ -1,0 +1,24 @@
+<mat-progress-spinner *ngIf="loading(); else content" mode="indeterminate" />
+<ng-template #content>
+  <app-map-controls-overlay (contextmenu)="openContextMenu($event)">
+    <app-map-simple-overlay
+      appMapObjectEditingOverlay
+      [overlayType]="OVERLAY_TYPE.OBJECT_EDIT"
+      class="object-edit-overlay"
+    >
+      <app-map-simple-overlay
+        appMapAreaEditingOverlay
+        [overlayType]="OVERLAY_TYPE.AREA_EDIT"
+        class="area-edit-overlay"
+      >
+        <app-map-simple-overlay [overlayType]="OVERLAY_TYPE.OBJECT" class="object-overlay">
+          <app-map-simple-overlay [overlayType]="OVERLAY_TYPE.AREA" class="area-overlay">
+            <app-map-simple-overlay [overlayType]="OVERLAY_TYPE.MESH" class="mesh-overlay">
+              <app-map-image />
+            </app-map-simple-overlay>
+          </app-map-simple-overlay>
+        </app-map-simple-overlay>
+      </app-map-simple-overlay>
+    </app-map-simple-overlay>
+  </app-map-controls-overlay>
+</ng-template>

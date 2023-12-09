@@ -1,10 +1,13 @@
 import { inject, Injectable } from '@angular/core';
 import { CHECK_RESULT } from '../constants';
-import { DICE_TYPE, DiceRollerService, DiceRollWithModifierResult } from './dice-roller.service';
+import { DICE_TYPE, DiceRollerService, type DiceRollWithModifierResult } from './dice-roller.service';
 
 export type CheckResult = DiceRollWithModifierResult & { targetDC: number; checkResult: CHECK_RESULT };
 
-export type DoCheckOptions = { critSuccessRange: [number, number]; critFailureRange: [number, number] };
+export interface DoCheckOptions {
+  critSuccessRange: [number, number];
+  critFailureRange: [number, number];
+}
 
 @Injectable({
   providedIn: 'root',

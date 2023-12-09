@@ -1,0 +1,18 @@
+<mat-form-field>
+  <mat-label>Название области</mat-label>
+  <input matInput placeholder="Название области" [formControl]="areaForm.controls.title" />
+</mat-form-field>
+<mat-form-field>
+  <mat-label>Цвет</mat-label>
+  <input matInput [formControl]="areaForm.controls.color" />
+  <ngx-colors
+    matSuffix
+    ngx-colors-trigger
+    style="display: inline-block; margin: 5px"
+    [formControl]="areaForm.controls.color"
+  ></ngx-colors>
+</mat-form-field>
+<span class="area-edit-action-buttons">
+  <button mat-raised-button color="accent" (click)="cancel()">Отменить</button>
+  <button mat-raised-button color="primary" (click)="save()" [disabled]="isAreaNotValid()">Сохранить</button>
+</span>

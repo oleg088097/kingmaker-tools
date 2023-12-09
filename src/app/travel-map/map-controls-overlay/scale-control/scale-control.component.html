@@ -1,0 +1,7 @@
+<mat-card>
+  <mat-card-content>
+    <button mat-raised-button (click)="onScaleMinus()" [disabled]="isScaleMinusDisabled()">-</button>
+    <button mat-raised-button disabled>{{ scale() * 100 }}%</button>
+    <button mat-raised-button (click)="onScalePlus()" [disabled]="isScalePlusDisabled()">+</button>
+  </mat-card-content>
+</mat-card>

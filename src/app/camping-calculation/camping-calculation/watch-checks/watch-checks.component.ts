@@ -4,28 +4,32 @@ import {
   EventEmitter,
   Input,
   Output,
-  Signal,
   TemplateRef,
   ViewChild,
-  WritableSignal,
   computed,
   effect,
   inject,
   signal,
+  type Signal,
+  type WritableSignal,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, Validators } from '@angular/forms';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { Store } from '@ngrx/store';
 import { takeUntil } from 'rxjs';
-import { CampingCalculationModuleState } from '../../+state/+module-state';
-import { WatchChecksActions, WatchChecksState, watchChecksFeature } from '../../+state/watch-checks.state';
-import { CheckPerformerService, CheckResult } from '../../../shared/services';
+import { type CampingCalculationModuleState } from '../../+state/+module-state';
+import {
+  WatchChecksActions,
+  watchChecksFeature,
+  type WatchChecksState,
+} from '../../+state/watch-checks.state';
+import { CheckPerformerService, type CheckResult } from '../../../shared/services';
 import { BreakpointDetectorService } from '../../../shared/services/breakpoint-detector.service';
 import { CheckDependenciesAggregatorService } from '../../../shared/services/check-dependencies-aggregator.service';
 import { DestroyService } from '../../../utils/destroy.service';
-import { CampingCalculationDataWatchCheck } from '../../interfaces/camping-calculation-data';
-import { CampingResultsChange } from '../camping-checks/camping-checks.component';
+import { type CampingCalculationDataWatchCheck } from '../../interfaces/camping-calculation-data';
+import { type CampingResultsChange } from '../camping-checks/camping-checks.component';
 
 export interface WatchCheckResult {
   id: string;
@@ -50,6 +54,7 @@ export class WatchChecksComponent {
     this.checkOutdated.set(true);
     this._campingResults = campingResults;
   }
+
   @Output() resultsChange: EventEmitter<WatchResultChange> = new EventEmitter<WatchResultChange>();
   @ViewChild('resultTemplate', { read: TemplateRef }) resultTemplate!: TemplateRef<unknown>;
   protected destroy$ = inject(DestroyService);
@@ -57,6 +62,7 @@ export class WatchChecksComponent {
     nonNullable: true,
     validators: Validators.required,
   });
+
   protected checkOutdated: WritableSignal<boolean> = signal(false);
   protected editMode: WritableSignal<boolean> = signal(false);
   protected store: Store<CampingCalculationModuleState> = inject(Store);
@@ -67,17 +73,24 @@ export class WatchChecksComponent {
       requireSync: true,
     },
   );
+
   protected enabledChecks: Signal<CampingCalculationDataWatchCheck[]> = computed(() =>
     this.watchChecksState().checks.filter((check) => !check.disabled),
   );
-  private skillCheckPerformerService: CheckPerformerService = inject(CheckPerformerService);
-  private checkDependenciesAggregatorService: CheckDependenciesAggregatorService = inject(
+
+  private readonly skillCheckPerformerService: CheckPerformerService = inject(CheckPerformerService);
+  private readonly checkDependenciesAggregatorService: CheckDependenciesAggregatorService = inject(
     CheckDependenciesAggregatorService,
   );
-  private isTouchUi = toSignal(inject(BreakpointDetectorService).observeBreakpoint('(max-width: 800px)'), {
-    requireSync: true,
-  });
-  private matBottomSheet: MatBottomSheet = inject(MatBottomSheet);
+
+  private readonly isTouchUi = toSignal(
+    inject(BreakpointDetectorService).observeBreakpoint('(max-width: 800px)'),
+    {
+      requireSync: true,
+    },
+  );
+
+  private readonly matBottomSheet: MatBottomSheet = inject(MatBottomSheet);
   private _campingResults: CampingResultsChange | null = null;
 
   constructor() {
@@ -166,7 +179,7 @@ export class WatchChecksComponent {
     );
   }
 
-  protected openResultBottomSheet() {
+  protected openResultBottomSheet(): void {
     this.matBottomSheet.open(this.resultTemplate);
   }
 }

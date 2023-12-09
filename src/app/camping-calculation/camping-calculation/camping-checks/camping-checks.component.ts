@@ -7,26 +7,26 @@ import {
   Input,
   Output,
   signal,
-  Signal,
-  WritableSignal,
+  type Signal,
+  type WritableSignal,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { takeUntil } from 'rxjs';
-import { CampingCalculationModuleState } from '../../+state/+module-state';
+import { type CampingCalculationModuleState } from '../../+state/+module-state';
 import {
   CampingChecksActions,
   campingChecksFeature,
-  CampingChecksState,
+  type CampingChecksState,
 } from '../../+state/camping-checks.state';
-import { CheckPerformerService, CheckResult } from '../../../shared/services';
+import { CheckPerformerService, type CheckResult } from '../../../shared/services';
 import { CheckDependenciesAggregatorService } from '../../../shared/services/check-dependencies-aggregator.service';
 import { DestroyService } from '../../../utils/destroy.service';
 import {
-  CampingCalculationData,
-  CampingCalculationDataCampingCheck,
-  CheckDescriptionCamping,
+  type CampingCalculationData,
+  type CampingCalculationDataCampingCheck,
+  type CheckDescriptionCamping,
 } from '../../interfaces/camping-calculation-data';
 
 export interface CampingResultsChange {
@@ -54,6 +54,7 @@ export class CampingChecksComponent {
       }
     }
   }
+
   @Output() resultsChange: EventEmitter<CampingResultsChange> = new EventEmitter<CampingResultsChange>();
 
   protected destroy$ = inject(DestroyService);
@@ -61,6 +62,7 @@ export class CampingChecksComponent {
     nonNullable: true,
     validators: Validators.required,
   });
+
   protected checksOutdated: WritableSignal<boolean> = signal(false);
   protected displayedColumns: string[] = ['title', 'modifier', 'dc', 'outcome'];
   protected store: Store<CampingCalculationModuleState> = inject(Store);
@@ -75,8 +77,9 @@ export class CampingChecksComponent {
       },
     },
   );
-  private skillCheckPerformerService: CheckPerformerService = inject(CheckPerformerService);
-  private checkDependenciesAggregatorService: CheckDependenciesAggregatorService = inject(
+
+  private readonly skillCheckPerformerService: CheckPerformerService = inject(CheckPerformerService);
+  private readonly checkDependenciesAggregatorService: CheckDependenciesAggregatorService = inject(
     CheckDependenciesAggregatorService,
   );
 
@@ -98,7 +101,7 @@ export class CampingChecksComponent {
   }
 
   protected doAllChecks(): void {
-    const checkResultsMap: Map<string, CheckResult> = new Map();
+    const checkResultsMap = new Map<string, CheckResult>();
     for (const check of this.campingChecksState().checks) {
       const dependenciesOptions = this.checkDependenciesAggregatorService.aggregateDependenciesOptions(
         check.dependencies,
@@ -122,7 +125,7 @@ export class CampingChecksComponent {
 
   protected getResultTooltip(id: string): string {
     const checkResult = this.checkResults().get(id);
-    return (checkResult ? this.checksInfo().get(id)?.outcomes[checkResult.checkResult] : null) ?? '';
+    return (checkResult != null ? this.checksInfo().get(id)?.outcomes[checkResult.checkResult] : null) ?? '';
   }
 
   protected onModifierChange(check: CheckDescriptionCamping, event: Event): void {
