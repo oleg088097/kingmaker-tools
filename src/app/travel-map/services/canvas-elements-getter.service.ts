@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { OVERLAY_TYPE } from '../constants/overlay-type';
+import { type Coordinates } from '../interfaces/coordinates';
 import { AreaRendererService } from './renderers/area-renderer.service';
 import { MeshRendererService } from './renderers/mesh-renderer.service';
 import { ObjectEditRendererService } from './renderers/object-edit-renderer.service';
@@ -13,24 +14,25 @@ export class CanvasElementsGetterService {
   private readonly objectRendererService: ObjectRendererService = inject(ObjectRendererService);
   private readonly objectEditRendererService: ObjectEditRendererService = inject(ObjectEditRendererService);
 
-  public getMeshElementFromEvent(event: MouseEvent): string | undefined {
-    return this.getMeshElementsFromEvent(event, OVERLAY_TYPE.MESH, this.meshRendererService).pop();
+  // { type?: never } to prevent Events (MouseEvent) as coords param
+  public getMeshElementFromCoords(coords: Coordinates & { type?: never }): string | undefined {
+    return this.getMeshElementsFromCoords(coords, OVERLAY_TYPE.MESH, this.meshRendererService).pop();
   }
 
-  public getAreaElementsFromEvent(event: MouseEvent): string[] {
-    return this.getMeshElementsFromEvent(event, OVERLAY_TYPE.AREA, this.areaRendererService);
+  public getAreaElementsFromCoords(coords: Coordinates & { type?: never }): string[] {
+    return this.getMeshElementsFromCoords(coords, OVERLAY_TYPE.AREA, this.areaRendererService);
   }
 
-  public getObjectElementsFromEvent(event: MouseEvent): string[] {
-    return this.getMeshElementsFromEvent(event, OVERLAY_TYPE.OBJECT, this.objectRendererService);
+  public getObjectElementsFromCoords(coords: Coordinates & { type?: never }): string[] {
+    return this.getMeshElementsFromCoords(coords, OVERLAY_TYPE.OBJECT, this.objectRendererService);
   }
 
-  public getEditObjectElementFromEvent(event: MouseEvent): string[] {
-    return this.getMeshElementsFromEvent(event, OVERLAY_TYPE.OBJECT_EDIT, this.objectEditRendererService);
+  public getEditObjectElementFromCoords(coords: Coordinates & { type?: never }): string[] {
+    return this.getMeshElementsFromCoords(coords, OVERLAY_TYPE.OBJECT_EDIT, this.objectEditRendererService);
   }
 
-  private getMeshElementsFromEvent(
-    event: MouseEvent,
+  private getMeshElementsFromCoords(
+    coords: Coordinates,
     overlayType: OVERLAY_TYPE,
     renderer: Renderer,
   ): string[] {
@@ -39,6 +41,6 @@ export class CanvasElementsGetterService {
     if (context == null) {
       return [];
     }
-    return renderer.getCoordsElements(event.offsetX, event.offsetY, context);
+    return renderer.getCoordsElements(coords.x, coords.y, context);
   }
 }

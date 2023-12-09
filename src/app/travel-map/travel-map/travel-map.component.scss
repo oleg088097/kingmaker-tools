@@ -1,10 +1,10 @@
 :host {
-  --kt-control-overlay-z-index: 100;
-  --kt-object-edit-overlay-z-index: 97;
-  --kt-area-edit-overlay-z-index: 96;
-  --kt-object-overlay-z-index: 95;
-  --kt-area-overlay-z-index: 91;
-  --kt-mesh-overlay-z-index: 90;
+  --kt-control-overlay-z-index: calc(var(--kt-header-z-index) + 5);
+  --kt-object-edit-overlay-z-index: calc(var(--kt-header-z-index) - 5);
+  --kt-area-edit-overlay-z-index: calc(var(--kt-object-edit-overlay-z-index) - 1);
+  --kt-object-overlay-z-index: calc(var(--kt-area-edit-overlay-z-index) - 5);
+  --kt-area-overlay-z-index: calc(var(--kt-object-overlay-z-index) - 1);
+  --kt-mesh-overlay-z-index: calc(var(--kt-area-overlay-z-index) - 1);
   display: block;
   width: fit-content;
   height: fit-content;

@@ -1,5 +1,5 @@
 import { CdkMenuModule } from '@angular/cdk/menu';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -87,6 +87,7 @@ import { TravelMapComponent } from './travel-map/travel-map.component';
     MatInputModule,
     NgxColorsModule,
     MatSelectModule,
+    NgOptimizedImage,
   ],
   providers: [
     AreaEditorPluginService,

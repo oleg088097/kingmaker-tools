@@ -1,10 +1,23 @@
 import { inject, Injectable, type OnDestroy, type Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
-import { combineLatest, EMPTY, filter, first, fromEvent, merge, Subject, switchMap, takeUntil } from 'rxjs';
+import {
+  combineLatest,
+  filter,
+  first,
+  fromEvent,
+  map,
+  merge,
+  Subject,
+  switchMap,
+  takeUntil,
+  type Observable,
+} from 'rxjs';
 import { type TravelMapModuleState } from '../../+state/+module-state';
 import { TravelMapObjectsActions, travelMapObjectsFeature } from '../../+state/travel-map-objects.state';
+import { type Coordinates } from '../../interfaces/coordinates';
 import { type MapObjectEditState } from '../../interfaces/map-object-state';
+import { pointerEventToCoords } from '../../utils/event-coords-converter';
 import { CanvasElementsGetterService } from '../canvas-elements-getter.service';
 import { type CanvasManagerPlugin } from '../canvas-manager-provider.service';
 import { MeshRelativeCoordsCalcService } from '../mesh-relative-coords-calc.service';
@@ -14,9 +27,9 @@ export class ObjectEditorPluginService implements CanvasManagerPlugin, OnDestroy
   private readonly destroy$ = new Subject<void>();
   private readonly canvas$ = new Subject<HTMLCanvasElement | null>();
   private readonly detach$ = new Subject<void>();
-  private readonly destroyDownListener$: Subject<void> = new Subject<void>();
   private readonly destroyMoveListeners$: Subject<void> = new Subject<void>();
-  private mouseMoveInProgress: boolean = false;
+  private isPointerMoveInProgress: boolean = false;
+  private isObjectInteractionInProgress: boolean = false;
   private readonly canvasElementsGetterService = inject(CanvasElementsGetterService);
   private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   private readonly editObjectState: Signal<MapObjectEditState | null> = toSignal(
@@ -30,30 +43,55 @@ export class ObjectEditorPluginService implements CanvasManagerPlugin, OnDestroy
     MeshRelativeCoordsCalcService,
   );
 
+  private readonly editObjectCanvasCombination: Observable<
+    [MapObjectEditState | null, HTMLCanvasElement | null]
+  > = combineLatest([this.store.select(travelMapObjectsFeature.selectEditObject), this.canvas$]);
+
+  private readonly destroyDownListener$: Observable<void> = this.editObjectCanvasCombination.pipe(
+    filter((combination) => !this.isCanvasSubscribable(...combination)),
+    map(() => undefined),
+  );
+
+  constructor() {
+    const filteredEvents = this.editObjectCanvasCombination.pipe(
+      filter((combination): combination is [MapObjectEditState, HTMLCanvasElement] =>
+        this.isCanvasSubscribable(...combination),
+      ),
+    );
+    filteredEvents
+      .pipe(
+        switchMap(([, canvasElement]) => {
+          return fromEvent<PointerEvent>(canvasElement, 'pointerdown').pipe(
+            takeUntil(merge(this.detach$, this.destroyDownListener$)),
+          );
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe(this.registerMouseListener.bind(this));
+
+    // Disable touchstart to prevent from panning when interacting with an object
+    filteredEvents
+      .pipe(
+        switchMap(([, canvasElement]) => {
+          return fromEvent<TouchEvent>(canvasElement, 'touchstart').pipe(
+            takeUntil(merge(this.detach$, this.destroyDownListener$)),
+          );
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe((event) => {
+        if (this.isObjectInteractionInProgress) {
+          event.preventDefault();
+        }
+      });
+  }
+
   public attach(canvasElement: HTMLCanvasElement | null): void {
     this.detach();
     if (canvasElement == null) {
       return;
     }
     this.canvas$.next(canvasElement);
-  }
-
-  constructor() {
-    combineLatest([this.store.select(travelMapObjectsFeature.selectEditObject), this.canvas$])
-      .pipe(
-        switchMap(([editObjectState, canvasElement]) => {
-          if (editObjectState != null && canvasElement != null) {
-            return fromEvent<MouseEvent>(canvasElement, 'mousedown').pipe(
-              takeUntil(merge(this.detach$, this.destroyDownListener$)),
-            );
-          } else {
-            this.destroyDownListener$.next();
-            return EMPTY;
-          }
-        }),
-        takeUntil(this.destroy$),
-      )
-      .subscribe(this.registerMouseListener.bind(this));
   }
 
   public detach(): void {
@@ -65,49 +103,63 @@ export class ObjectEditorPluginService implements CanvasManagerPlugin, OnDestroy
     this.destroy$.next();
   }
 
-  private registerMouseListener(mouseDownEvent: MouseEvent): void {
-    const editObjectState = this.editObjectState();
-    if (editObjectState == null) {
+  private isCanvasSubscribable(
+    editObjectState: MapObjectEditState | null,
+    canvasElement: HTMLCanvasElement | null,
+  ): boolean {
+    return editObjectState != null && canvasElement != null;
+  }
+
+  private registerMouseListener(downEvent: PointerEvent): void {
+    if (!this.isObjectInteractionCoords(pointerEventToCoords(downEvent))) {
       return;
     }
-    const objectIds = this.canvasElementsGetterService.getEditObjectElementFromEvent(mouseDownEvent);
-    if (!objectIds.includes(editObjectState.id as string)) {
-      return;
-    }
-    this.mouseMoveInProgress = false;
+    this.isPointerMoveInProgress = false;
+    this.isObjectInteractionInProgress = true;
     this.destroyMoveListeners$.next();
-    const mouseup$ = fromEvent<MouseEvent>(document.body, 'mouseup').pipe(
+    const pointerup$ = fromEvent<PointerEvent>(document.body, 'pointerup').pipe(
       first(),
       takeUntil(merge(this.detach$, this.destroyMoveListeners$)),
     );
-    mouseup$.pipe(filter(() => this.mouseMoveInProgress)).subscribe(this.objectDropHandler.bind(this));
-    fromEvent<MouseEvent>(mouseDownEvent.currentTarget as HTMLElement, 'mousemove')
-      .pipe(takeUntil(merge(mouseup$, this.detach$, this.destroyMoveListeners$)))
+    pointerup$.pipe(filter(() => this.isPointerMoveInProgress)).subscribe(this.objectDropHandler.bind(this));
+    fromEvent<PointerEvent>(downEvent.currentTarget as HTMLElement, 'pointermove')
+      .pipe(takeUntil(merge(pointerup$, this.detach$, this.destroyMoveListeners$)))
       .subscribe(this.objectDragHandler.bind(this));
   }
 
-  private objectDropHandler(mouseUpEvent: MouseEvent): void {
-    this.updateObjectPosition(mouseUpEvent);
-    this.mouseMoveInProgress = false;
+  private isObjectInteractionCoords(coords: Coordinates): boolean {
+    const editObjectState = this.editObjectState();
+    if (editObjectState == null) {
+      return false;
+    }
+    const objectIds = this.canvasElementsGetterService.getEditObjectElementFromCoords(coords);
+    return objectIds.includes(editObjectState.id as string);
   }
 
-  private objectDragHandler(mouseMoveEvent: MouseEvent): void {
-    this.updateObjectPosition(mouseMoveEvent);
-    this.mouseMoveInProgress = true;
+  private objectDropHandler(pointerupEvent: PointerEvent): void {
+    this.updateObjectPosition(pointerupEvent);
+    this.isPointerMoveInProgress = false;
+    this.isObjectInteractionInProgress = false;
   }
 
-  private updateObjectPosition(mouseMoveEvent: MouseEvent): void {
+  private objectDragHandler(pointermoveEvent: PointerEvent): void {
+    this.updateObjectPosition(pointermoveEvent);
+    this.isPointerMoveInProgress = true;
+  }
+
+  private updateObjectPosition(pointerMoveEvent: PointerEvent): void {
     const editObjectState = this.editObjectState();
     if (editObjectState == null) {
       return;
     }
-    const meshElementId = this.canvasElementsGetterService.getMeshElementFromEvent(mouseMoveEvent);
+    const coords = pointerEventToCoords(pointerMoveEvent);
+    const meshElementId = this.canvasElementsGetterService.getMeshElementFromCoords(coords);
     if (meshElementId == null) {
       return;
     }
     const relativeCoords = this.meshRelativeCoordsCalcService.calculateRelativeCoordinates(
-      mouseMoveEvent.offsetX,
-      mouseMoveEvent.offsetY,
+      coords.x,
+      coords.y,
       meshElementId,
     );
     if (relativeCoords == null) {

@@ -21,5 +21,6 @@
 .edit-control {
   position: fixed;
   top: 0;
-  left: 50vh;
+  left: 50vw;
+  transform: translateX(-50%);
 }

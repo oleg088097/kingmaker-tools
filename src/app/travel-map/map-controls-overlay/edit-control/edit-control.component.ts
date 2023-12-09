@@ -24,16 +24,7 @@ import { type MapObjectEditState } from '../../interfaces/map-object-state';
 })
 export class EditControlComponent {
   private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
-  private readonly destroy$ = inject(DestroyService);
   protected readonly isHideDisplayControls: WritableSignal<boolean> = signal(false);
-  /*
-  protected readonly isTouchUI: Signal<boolean> = toSignal(
-    inject(BreakpointObserver)
-      .observe('(max-width: 767px)')
-      .pipe(map((breakpoint) => breakpoint.matches)),
-    { requireSync: true },
-  );
-  */
 
   protected readonly editAreaState: Signal<MapAreaEditState | null> = toSignal(
     this.store.select(travelMapAreasFeature.selectEditArea),

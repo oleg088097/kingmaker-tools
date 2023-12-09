@@ -1,10 +1,24 @@
 import { Injectable, inject, type OnDestroy, type Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
-import { EMPTY, Subject, combineLatest, first, fromEvent, merge, switchMap, takeUntil } from 'rxjs';
+import {
+  Subject,
+  combineLatest,
+  filter,
+  first,
+  fromEvent,
+  map,
+  merge,
+  switchMap,
+  takeUntil,
+  type Observable,
+} from 'rxjs';
 import { type TravelMapModuleState } from '../../+state/+module-state';
 import { TravelMapAreasActions, travelMapAreasFeature } from '../../+state/travel-map-area.state';
+import { TouchUiService } from '../../../utils/touch-ui.service';
+import { type Coordinates } from '../../interfaces/coordinates';
 import { type MapAreaEditState } from '../../interfaces/map-area-state';
+import { pointerEventToCoords } from '../../utils/event-coords-converter';
 import { CanvasElementsGetterService } from '../canvas-elements-getter.service';
 import { type CanvasManagerPlugin } from '../canvas-manager-provider.service';
 
@@ -14,10 +28,9 @@ export class AreaEditorPluginService implements CanvasManagerPlugin, OnDestroy {
   private readonly canvas$ = new Subject<HTMLCanvasElement | null>();
   private readonly detach$ = new Subject<void>();
   private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
-  protected readonly canvasElementsGetterService = inject(CanvasElementsGetterService);
-  private readonly mouseMoveMeshIds: Set<string> = new Set<string>();
+  private readonly canvasElementsGetterService = inject(CanvasElementsGetterService);
+  private readonly pointerMoveMeshIds: Set<string> = new Set<string>();
   private readonly destroyMoveUpListeners$: Subject<void> = new Subject<void>();
-  private readonly destroyDownListener$: Subject<void> = new Subject<void>();
   private readonly editAreaState: Signal<MapAreaEditState | null> = toSignal(
     this.store.select(travelMapAreasFeature.selectEditArea),
     {
@@ -25,30 +38,39 @@ export class AreaEditorPluginService implements CanvasManagerPlugin, OnDestroy {
     },
   );
 
+  private readonly editAreaCanvasCombination: Observable<
+    [MapAreaEditState | null, HTMLCanvasElement | null]
+  > = combineLatest([this.store.select(travelMapAreasFeature.selectEditArea), this.canvas$]);
+
+  private readonly destroyDownListener$: Observable<void> = this.editAreaCanvasCombination.pipe(
+    filter((combination) => !this.isCanvasSubscribable(...combination)),
+    map(() => undefined),
+  );
+
+  protected readonly isTouchUI: Signal<boolean> = inject(TouchUiService).isTouchUI;
+
+  constructor() {
+    this.editAreaCanvasCombination
+      .pipe(
+        filter((combination): combination is [MapAreaEditState, HTMLCanvasElement] =>
+          this.isCanvasSubscribable(...combination),
+        ),
+        switchMap(([, canvasElement]) => {
+          return fromEvent<PointerEvent>(canvasElement, 'pointerdown').pipe(
+            takeUntil(merge(this.detach$, this.destroyDownListener$)),
+          );
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe(this.registerMouseListener.bind(this));
+  }
+
   public attach(canvasElement: HTMLCanvasElement | null): void {
     this.detach();
     if (canvasElement == null) {
       return;
     }
     this.canvas$.next(canvasElement);
-  }
-
-  constructor() {
-    combineLatest([this.store.select(travelMapAreasFeature.selectEditArea), this.canvas$])
-      .pipe(
-        switchMap(([editAreaState, canvasElement]) => {
-          if (editAreaState != null && canvasElement != null) {
-            return fromEvent<MouseEvent>(canvasElement, 'mousedown').pipe(
-              takeUntil(merge(this.detach$, this.destroyDownListener$)),
-            );
-          } else {
-            this.destroyDownListener$.next();
-            return EMPTY;
-          }
-        }),
-        takeUntil(this.destroy$),
-      )
-      .subscribe(this.registerMouseListener.bind(this));
   }
 
   public detach(): void {
@@ -60,12 +82,19 @@ export class AreaEditorPluginService implements CanvasManagerPlugin, OnDestroy {
     this.destroy$.next();
   }
 
-  private areaEditingClickHandler(event: MouseEvent): void {
+  private isCanvasSubscribable(
+    editObjectState: MapAreaEditState | null,
+    canvasElement: HTMLCanvasElement | null,
+  ): boolean {
+    return editObjectState != null && canvasElement != null;
+  }
+
+  private areaEditingClickHandler(event: PointerEvent): void {
     const editAreaState = this.editAreaState();
     if (editAreaState == null) {
       return;
     }
-    const meshId = this.canvasElementsGetterService.getMeshElementFromEvent(event);
+    const meshId = this.canvasElementsGetterService.getMeshElementFromCoords(pointerEventToCoords(event));
     if (meshId == null) {
       return;
     }
@@ -78,49 +107,52 @@ export class AreaEditorPluginService implements CanvasManagerPlugin, OnDestroy {
     return editAreaState.meshElementIds?.findIndex((id) => id === meshId) ?? -1;
   }
 
-  private registerMouseListener(mouseDownEvent: MouseEvent): void {
+  private registerMouseListener(downEvent: PointerEvent): void {
     const editAreaState = this.editAreaState();
     if (editAreaState == null) {
       return;
     }
-    const meshId = this.canvasElementsGetterService.getMeshElementFromEvent(mouseDownEvent);
+    const meshId = this.canvasElementsGetterService.getMeshElementFromCoords(pointerEventToCoords(downEvent));
     if (meshId == null) {
       return;
     }
     this.destroyMoveUpListeners$.next();
-    let mouseMoveInProgress: boolean = false;
-    this.mouseMoveMeshIds.clear();
-    const mouseMoveMode = this.getAreaEditMode(mouseDownEvent);
-    const mouseup$ = fromEvent<MouseEvent>(document.body, 'mouseup').pipe(
+    let pointerMoveInProgress: boolean = false;
+    this.pointerMoveMeshIds.clear();
+    const operationForMeshElement = this.getAreaEditOperationForMeshElement(downEvent);
+    const pointerup$ = fromEvent<PointerEvent>(document.body, 'pointerup').pipe(
       first(),
       takeUntil(merge(this.detach$, this.destroyMoveUpListeners$)),
     );
-    mouseup$.subscribe((mouseUpEvent) => {
-      if (!mouseMoveInProgress) {
-        this.areaEditingClickHandler(mouseUpEvent);
+    pointerup$.subscribe((pointerupEvent) => {
+      if (!pointerMoveInProgress) {
+        this.areaEditingClickHandler(pointerupEvent);
       }
     });
-    fromEvent<MouseEvent>(mouseDownEvent.currentTarget as HTMLElement, 'mousemove')
-      .pipe(takeUntil(merge(mouseup$, this.detach$, this.destroyMoveUpListeners$)))
-      .subscribe((mouseMoveEvent: MouseEvent) => {
-        mouseMoveInProgress = true;
-        const editAreaState = this.editAreaState();
-        if (editAreaState == null) {
-          return;
-        }
-        const meshId = this.canvasElementsGetterService.getMeshElementFromEvent(mouseMoveEvent);
-        if (meshId == null) {
-          return;
-        }
-        if (this.mouseMoveMeshIds.has(meshId)) {
-          return;
-        }
-        if (mouseMoveMode !== this.getAreaEditMode(mouseMoveEvent)) {
-          return;
-        }
-        this.mouseMoveMeshIds.add(meshId);
-        this.areaEditingHandler(meshId);
-      });
+    if (!this.isTouchUI()) {
+      fromEvent<PointerEvent>(downEvent.currentTarget as HTMLElement, 'pointermove')
+        .pipe(takeUntil(merge(pointerup$, this.detach$, this.destroyMoveUpListeners$)))
+        .subscribe((pointerMoveEvent: PointerEvent) => {
+          pointerMoveInProgress = true;
+          const editAreaState = this.editAreaState();
+          if (editAreaState == null) {
+            return;
+          }
+          const coords = pointerEventToCoords(pointerMoveEvent);
+          const meshId = this.canvasElementsGetterService.getMeshElementFromCoords(coords);
+          if (meshId == null) {
+            return;
+          }
+          if (this.pointerMoveMeshIds.has(meshId)) {
+            return;
+          }
+          if (operationForMeshElement !== this.getAreaEditOperationForMeshElement(coords)) {
+            return;
+          }
+          this.pointerMoveMeshIds.add(meshId);
+          this.areaEditingHandler(meshId);
+        });
+    }
   }
 
   private areaEditingHandler(meshId: string): void {
@@ -144,12 +176,12 @@ export class AreaEditorPluginService implements CanvasManagerPlugin, OnDestroy {
     );
   }
 
-  private getAreaEditMode(event: MouseEvent): 'add' | 'remove' | null {
+  private getAreaEditOperationForMeshElement(coords: Coordinates): 'add' | 'remove' | null {
     const editAreaState = this.editAreaState();
     if (editAreaState == null) {
       return null;
     }
-    const meshId = this.canvasElementsGetterService.getMeshElementFromEvent(event);
+    const meshId = this.canvasElementsGetterService.getMeshElementFromCoords(coords);
     if (meshId == null) {
       return null;
     }

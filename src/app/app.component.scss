@@ -4,6 +4,14 @@
   overflow: auto;
   display: flex;
   flex-direction: column;
+  --kt-header-z-index: 99;
+}
+
+mat-toolbar {
+  position: sticky;
+  left: 0;
+  top: 0;
+  z-index: var(--kt-header-z-index);
 }
 
 .content {

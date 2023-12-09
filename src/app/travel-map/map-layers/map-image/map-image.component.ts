@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, HostBinding, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { type TravelMapModuleState } from '../../+state/+module-state';
@@ -15,8 +15,4 @@ export class MapImageComponent {
   protected travelMapImageState = toSignal(this.store.select(travelMapImageFeature.selectImage), {
     requireSync: true,
   });
-
-  @HostBinding('style.background-image') protected get backgroundImage(): string {
-    return `url(${this.travelMapImageState().url})`;
-  }
 }

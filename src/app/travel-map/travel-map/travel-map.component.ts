@@ -24,6 +24,7 @@ import {
 import { type TravelMapData } from '../interfaces/travel-map-data';
 import { CanvasElementsGetterService } from '../services/canvas-elements-getter.service';
 import { CanvasManagerProviderService } from '../services/canvas-manager-provider.service';
+import { pointerEventToCoords } from '../utils/event-coords-converter';
 
 @Component({
   selector: 'app-travel-map',
@@ -61,9 +62,11 @@ export class TravelMapComponent {
   }
 
   protected openContextMenu(event: MouseEvent): void {
-    const meshId = this.canvasElementsGetterService.getMeshElementFromEvent(event);
-    const areaIds = this.canvasElementsGetterService.getAreaElementsFromEvent(event);
-    const objectIds = this.canvasElementsGetterService.getObjectElementsFromEvent(event);
+    const meshId = this.canvasElementsGetterService.getMeshElementFromCoords(pointerEventToCoords(event));
+    const areaIds = this.canvasElementsGetterService.getAreaElementsFromCoords(pointerEventToCoords(event));
+    const objectIds = this.canvasElementsGetterService.getObjectElementsFromCoords(
+      pointerEventToCoords(event),
+    );
     event.preventDefault();
     event.stopPropagation();
     const positionStrategy = this.overlay
