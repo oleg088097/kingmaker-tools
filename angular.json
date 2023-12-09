@@ -60,10 +60,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "kingmaker-tools:build:production"
+              "buildTarget": "kingmaker-tools:build:production"
             },
             "development": {
-              "browserTarget": "kingmaker-tools:build:development"
+              "buildTarget": "kingmaker-tools:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -71,7 +71,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "kingmaker-tools:build"
+            "buildTarget": "kingmaker-tools:build"
           }
         },
         "test": {

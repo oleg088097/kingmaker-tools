@@ -37,7 +37,6 @@ import { AppComponent } from './app.component';
       autoPause: true,
       trace: false,
       traceLimit: 75,
-      connectOutsideZone: true,
     }),
     EffectsModule.forRoot(GlobalEffects),
     ServiceWorkerModule.register('ngsw-worker.js', {
