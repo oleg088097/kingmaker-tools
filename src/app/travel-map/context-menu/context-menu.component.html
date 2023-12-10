@@ -7,14 +7,14 @@
         </button>
         <hr />
       </ng-container>
-      <ng-container *ngIf="!editAreaState()">
+      <ng-container *ngIf="!hasEditState()">
         <button mat-list-item cdkMenuItem (click)="editArea(getEmptyAreaState())">Создать область</button>
         <button mat-list-item cdkMenuItem *ngIf="areas().length" [cdkMenuTriggerFor]="area">
           <span class="button-content">Редактировать область <mat-icon>arrow_right</mat-icon></span>
         </button>
         <hr />
       </ng-container>
-      <ng-container *ngIf="!editObjectState()">
+      <ng-container *ngIf="!hasEditState()">
         <button
           mat-list-item
           cdkMenuItem

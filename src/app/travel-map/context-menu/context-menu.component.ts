@@ -2,7 +2,7 @@ import { type OverlayRef } from '@angular/cdk/overlay';
 import { ChangeDetectionStrategy, Component, inject, InjectionToken, type Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
-import { map, takeUntil } from 'rxjs';
+import { combineLatest, map, takeUntil } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { type TravelMapModuleState } from '../+state/+module-state';
 import { TravelMapAreasActions, travelMapAreasFeature } from '../+state/travel-map-area.state';
@@ -68,15 +68,11 @@ export class ContextMenuComponent {
     { requireSync: true },
   );
 
-  protected editAreaState: Signal<MapAreaEditState | null> = toSignal(
-    this.store.select(travelMapAreasFeature.selectEditArea),
-    {
-      requireSync: true,
-    },
-  );
-
-  protected editObjectState: Signal<MapObjectEditState | null> = toSignal(
-    this.store.select(travelMapObjectsFeature.selectEditObject),
+  protected hasEditState: Signal<boolean> = toSignal(
+    combineLatest([
+      this.store.select(travelMapObjectsFeature.selectEditObject),
+      this.store.select(travelMapAreasFeature.selectEditArea),
+    ]).pipe(map(([editObject, editArea]) => Boolean(editObject ?? editArea))),
     {
       requireSync: true,
     },
