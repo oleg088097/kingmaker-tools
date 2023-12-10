@@ -5,7 +5,7 @@ export interface MapAreaEditState {
   meshElementIds: string[];
   type: string;
   color: string;
-  groups?: unknown[];
+  tags?: unknown[];
 }
 
 export interface MapAreaState extends Required<MapAreaEditState> {

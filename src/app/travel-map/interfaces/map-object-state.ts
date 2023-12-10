@@ -13,7 +13,7 @@ export interface MapObjectEditState {
   type: ICON_TYPE;
   color: string;
   icon: string;
-  groups?: unknown[];
+  tags?: unknown[];
 }
 
 export interface MapObjectState extends Required<MapObjectEditState> {

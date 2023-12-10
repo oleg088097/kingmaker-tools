@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "objects": {
     "olegTradingPost": {
       "id": "olegTradingPost",
@@ -21,7 +21,7 @@
       "meshElementIds": ["A19", "A20", "A21", "B19", "B20", "B21", "C19", "C20", "C21"],
       "type": "",
       "color": "#008000",
-      "groups": [],
+      "tags": [],
       "hidden": false
     }
   },
