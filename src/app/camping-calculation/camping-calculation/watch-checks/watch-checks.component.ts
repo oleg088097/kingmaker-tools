@@ -25,9 +25,9 @@ import {
   type WatchChecksState,
 } from '../../+state/watch-checks.state';
 import { CheckPerformerService, type CheckResult } from '../../../shared/services';
-import { BreakpointDetectorService } from '../../../shared/services/breakpoint-detector.service';
 import { CheckDependenciesAggregatorService } from '../../../shared/services/check-dependencies-aggregator.service';
 import { DestroyService } from '../../../utils/destroy.service';
+import { TouchUiService } from '../../../utils/touch-ui.service';
 import { type CampingCalculationDataWatchCheck } from '../../interfaces/camping-calculation-data';
 import { type CampingResultsChange } from '../camping-checks/camping-checks.component';
 
@@ -65,7 +65,8 @@ export class WatchChecksComponent {
 
   protected checkOutdated: WritableSignal<boolean> = signal(false);
   protected editMode: WritableSignal<boolean> = signal(false);
-  protected store: Store<CampingCalculationModuleState> = inject(Store);
+  protected store: Store<CampingCalculationModuleState> = inject<Store<CampingCalculationModuleState>>(Store);
+  private readonly isTouchUI: Signal<boolean> = inject(TouchUiService).isTouchUI;
   protected checkResult: WritableSignal<WatchCheckResult | null> = signal(null);
   protected watchChecksState: Signal<WatchChecksState> = toSignal(
     this.store.select(watchChecksFeature.name).pipe(takeUntil(this.destroy$)),
@@ -81,13 +82,6 @@ export class WatchChecksComponent {
   private readonly skillCheckPerformerService: CheckPerformerService = inject(CheckPerformerService);
   private readonly checkDependenciesAggregatorService: CheckDependenciesAggregatorService = inject(
     CheckDependenciesAggregatorService,
-  );
-
-  private readonly isTouchUi = toSignal(
-    inject(BreakpointDetectorService).observeBreakpoint('(max-width: 800px)'),
-    {
-      requireSync: true,
-    },
   );
 
   private readonly matBottomSheet: MatBottomSheet = inject(MatBottomSheet);
@@ -147,13 +141,15 @@ export class WatchChecksComponent {
     });
     this.checkOutdated.set(false);
 
-    if (this.isTouchUi()) {
+    if (this.isTouchUI()) {
       this.openResultBottomSheet();
     }
   }
 
   protected getCheckById(checkId: string): CampingCalculationDataWatchCheck {
-    return this.watchChecksState().checks.find(({ id }) => id === checkId)!;
+    return this.watchChecksState().checks.find(
+      ({ id }) => id === checkId,
+    ) as CampingCalculationDataWatchCheck;
   }
 
   protected onModifierChange(check: CampingCalculationDataWatchCheck, event: Event): void {

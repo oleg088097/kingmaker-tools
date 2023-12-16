@@ -9,7 +9,7 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { type TravelMapModuleState } from '../../+state/+module-state';
-import { travelMapAreasFeature } from '../../+state/travel-map-area.state';
+import { travelMapAreasFeature } from '../../+state/travel-map-areas.state';
 import { travelMapObjectsFeature } from '../../+state/travel-map-objects.state';
 import { DestroyService } from '../../../utils/destroy.service';
 import { type MapAreaEditState } from '../../interfaces/map-area-state';

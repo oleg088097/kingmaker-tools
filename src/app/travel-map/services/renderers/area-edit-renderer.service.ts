@@ -2,9 +2,8 @@ import { inject, Injectable, type Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { type TravelMapModuleState } from '../../+state/+module-state';
-import { travelMapAreasFeature } from '../../+state/travel-map-area.state';
+import { travelMapAreasFeature } from '../../+state/travel-map-areas.state';
 import { travelMapMeshFeature, type TravelMapMeshState } from '../../+state/travel-map-mesh.state';
-import { DEFAULT_AREA_FILL_COLOR } from '../../constants/default-color';
 import { type MapAreaEditState } from '../../interfaces/map-area-state';
 import { type MeshTileRender } from '../mesh-adapters/mesh-adapter-strategy';
 import { MeshRendererService } from './mesh-renderer.service';
@@ -77,11 +76,11 @@ export class AreaEditRendererService implements Renderer {
     return [];
   }
 
-  private redrawEditArea(area: MapAreaEditState | null, ctx: CanvasRenderingContext2D): void {
+  private redrawEditArea(area: MapAreaEditState, ctx: CanvasRenderingContext2D): void {
     if (this.editAreaRender != null) {
       ctx.save();
       ctx.globalAlpha = 0.5;
-      ctx.fillStyle = area?.color ?? DEFAULT_AREA_FILL_COLOR;
+      ctx.fillStyle = area.color;
       ctx.fill(this.editAreaRender.path);
 
       ctx.lineWidth = 3;

@@ -3,6 +3,7 @@ import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
+import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
@@ -13,12 +14,15 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { RouterModule } from '@angular/router';
+import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { NgxColorsModule } from 'ngx-colors';
-import { travelMapAreasFeature } from './+state/travel-map-area.state';
+import * as travelMapAreaEffects from './+state/travel-map-areas.effects';
+import { travelMapAreasFeature } from './+state/travel-map-areas.state';
 import { travelMapDisplaySettingsFeature } from './+state/travel-map-display-settings.state';
 import { travelMapImageFeature } from './+state/travel-map-image.state';
 import { travelMapMeshFeature } from './+state/travel-map-mesh.state';
+import * as travelMapObjectEffects from './+state/travel-map-objects.effects';
 import { travelMapObjectsFeature } from './+state/travel-map-objects.state';
 import { ContextMenuComponent } from './context-menu/context-menu.component';
 import { AreaEditControlComponent } from './map-controls-overlay/edit-control/area-edit-control/area-edit-control.component';
@@ -75,7 +79,9 @@ import { TravelMapComponent } from './travel-map/travel-map.component';
     StoreModule.forFeature(travelMapObjectsFeature),
     StoreModule.forFeature(travelMapAreasFeature),
     StoreModule.forFeature(travelMapDisplaySettingsFeature),
+    EffectsModule.forFeature(travelMapAreaEffects, travelMapObjectEffects),
     CdkMenuModule,
+    MatBottomSheetModule,
     MatButtonToggleModule,
     MatButtonModule,
     MatCardModule,

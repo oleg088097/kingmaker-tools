@@ -5,7 +5,7 @@ import { Store } from '@ngrx/store';
 import { combineLatest, map, takeUntil } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { type TravelMapModuleState } from '../+state/+module-state';
-import { TravelMapAreasActions, travelMapAreasFeature } from '../+state/travel-map-area.state';
+import { TravelMapAreasActions, travelMapAreasFeature } from '../+state/travel-map-areas.state';
 import { TravelMapMeshActions, travelMapMeshFeature } from '../+state/travel-map-mesh.state';
 import { TravelMapObjectsActions, travelMapObjectsFeature } from '../+state/travel-map-objects.state';
 import { DestroyService } from '../../utils/destroy.service';
@@ -101,6 +101,15 @@ export class ContextMenuComponent {
     this.overlayRef.dispose();
   }
 
+  protected deleteArea(area: MapAreaState): void {
+    this.store.dispatch(
+      TravelMapAreasActions.confirmDeleteArea({
+        value: area,
+      }),
+    );
+    this.overlayRef.dispose();
+  }
+
   protected editObject(object: MapObjectEditState | null): void {
     if (object === null) {
       this.overlayRef.dispose();
@@ -111,6 +120,15 @@ export class ContextMenuComponent {
         value: {
           ...object,
         },
+      }),
+    );
+    this.overlayRef.dispose();
+  }
+
+  protected deleteObject(object: MapObjectState): void {
+    this.store.dispatch(
+      TravelMapObjectsActions.confirmDeleteObject({
+        value: object,
       }),
     );
     this.overlayRef.dispose();

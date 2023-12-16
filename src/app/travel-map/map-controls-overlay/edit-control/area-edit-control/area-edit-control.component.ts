@@ -5,7 +5,7 @@ import { Store } from '@ngrx/store';
 import { isEqual } from 'lodash';
 import { distinctUntilChanged, filter, first, map, startWith, takeUntil } from 'rxjs';
 import { type TravelMapModuleState } from '../../../+state/+module-state';
-import { TravelMapAreasActions, travelMapAreasFeature } from '../../../+state/travel-map-area.state';
+import { TravelMapAreasActions, travelMapAreasFeature } from '../../../+state/travel-map-areas.state';
 import { DestroyService } from '../../../../utils/destroy.service';
 import { type MapAreaEditState, type MapAreaState } from '../../../interfaces/map-area-state';
 

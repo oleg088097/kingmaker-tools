@@ -17,10 +17,13 @@ export class AppComponent {
 
   constructor() {
     this.store.dispatch(GlobalActions.loadStoreStateFromLocalStorage());
-    from(navigator.storage.persist())
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((isPersisted) => {
-        console.log(`Persisted storage granted: ${String(isPersisted)}`);
-      });
+    // no navigator fo safari ~14, migrate to IndexedDb?
+    if (navigator?.storage != null) {
+      from(navigator.storage.persist())
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((isPersisted) => {
+          console.log(`Persisted storage granted: ${String(isPersisted)}`);
+        });
+    }
   }
 }

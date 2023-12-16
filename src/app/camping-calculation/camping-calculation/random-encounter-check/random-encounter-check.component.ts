@@ -54,7 +54,7 @@ export class RandomEncounterCheckComponent {
 
   protected checkResult: WritableSignal<CheckResult | undefined> = signal(undefined);
   protected checkOutdated: WritableSignal<boolean> = signal(false);
-  protected store: Store<CampingCalculationModuleState> = inject(Store);
+  protected store: Store<CampingCalculationModuleState> = inject<Store<CampingCalculationModuleState>>(Store);
   protected randomEncounterCheckState: Signal<RandomEncounterCheckState> = toSignal(
     this.store.select(randomEncounterCheckFeature.name).pipe(takeUntil(this.destroy$)),
     {

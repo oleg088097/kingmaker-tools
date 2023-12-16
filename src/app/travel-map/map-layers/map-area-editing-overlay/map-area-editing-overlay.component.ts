@@ -2,7 +2,7 @@ import { Directive, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { takeUntil } from 'rxjs';
 import { type TravelMapModuleState } from '../../+state/+module-state';
-import { travelMapAreasFeature } from '../../+state/travel-map-area.state';
+import { travelMapAreasFeature } from '../../+state/travel-map-areas.state';
 import { DestroyService } from '../../../utils/destroy.service';
 import { AreaEditorPluginService } from '../../services/editors/area-editor-plugin.service';
 import { MapSimpleOverlayComponent } from '../map-simple-overlay/map-simple-overlay.component';

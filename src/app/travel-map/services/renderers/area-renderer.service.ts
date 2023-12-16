@@ -2,7 +2,7 @@ import { inject, Injectable, type Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { type TravelMapModuleState } from '../../+state/+module-state';
-import { travelMapAreasFeature } from '../../+state/travel-map-area.state';
+import { travelMapAreasFeature } from '../../+state/travel-map-areas.state';
 import { type MapAreaState } from '../../interfaces/map-area-state';
 import { type MeshTileRender } from '../mesh-adapters/mesh-adapter-strategy';
 import { MeshRendererService } from './mesh-renderer.service';

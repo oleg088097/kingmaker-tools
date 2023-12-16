@@ -9,6 +9,8 @@ export const TravelMapObjectsActions = createActionGroup({
   source: 'Travel Map Objects',
   events: {
     upsertObject: props<{ value: MapObjectState }>(),
+    confirmDeleteObject: props<{ value: MapObjectState }>(),
+    doDeleteObject: props<{ value: MapObjectState }>(),
     updateEditObject: props<{ value: MapObjectEditState | null }>(),
   },
 });
@@ -59,6 +61,15 @@ export const travelMapObjectsFeature = createFeature({
       return {
         ...state,
         objects: Object.assign(cloneDeep(state.objects), { [props.value.id]: props.value }),
+      };
+    }),
+    on(TravelMapObjectsActions.doDeleteObject, (state, props): TravelMapObjectsStateInternal => {
+      const objectsClone = cloneDeep(state.objects);
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+      delete objectsClone[props.value.id];
+      return {
+        ...state,
+        objects: objectsClone,
       };
     }),
     on(TravelMapObjectsActions.updateEditObject, (state, props): TravelMapObjectsStateInternal => {

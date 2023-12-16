@@ -1,6 +1,6 @@
 import { createActionGroup, props } from '@ngrx/store';
 import { type TravelMapData } from '../interfaces/travel-map-data';
-import { type TravelMapAreasState, type travelMapAreasFeature } from './travel-map-area.state';
+import { type TravelMapAreasState, type travelMapAreasFeature } from './travel-map-areas.state';
 import {
   type TravelMapDisplaySettingsState,
   type travelMapDisplaySettingsFeature,

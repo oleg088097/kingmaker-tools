@@ -9,8 +9,11 @@
       </ng-container>
       <ng-container *ngIf="!hasEditState()">
         <button mat-list-item cdkMenuItem (click)="editArea(getEmptyAreaState())">Создать область</button>
-        <button mat-list-item cdkMenuItem *ngIf="areas().length" [cdkMenuTriggerFor]="area">
+        <button mat-list-item cdkMenuItem *ngIf="areas().length" [cdkMenuTriggerFor]="areaEditMenu">
           <span class="button-content">Редактировать область <mat-icon>arrow_right</mat-icon></span>
+        </button>
+        <button mat-list-item cdkMenuItem *ngIf="areas().length" [cdkMenuTriggerFor]="areaDeleteMenu">
+          <span class="button-content">Удалить область <mat-icon>arrow_right</mat-icon></span>
         </button>
         <hr />
       </ng-container>
@@ -23,14 +26,18 @@
         >
           Создать объект
         </button>
-        <button mat-list-item cdkMenuItem *ngIf="objects().length" [cdkMenuTriggerFor]="object">
+        <button mat-list-item cdkMenuItem *ngIf="objects().length" [cdkMenuTriggerFor]="objectEditMenu">
           <span class="button-content">Редактировать объект <mat-icon>arrow_right</mat-icon></span>
+        </button>
+        <button mat-list-item cdkMenuItem *ngIf="objects().length" [cdkMenuTriggerFor]="objectDeleteMenu">
+          <span class="button-content">Удалить объект <mat-icon>arrow_right</mat-icon></span>
         </button>
       </ng-container>
     </mat-action-list>
   </mat-card-content>
 </mat-card>
-<ng-template #area>
+
+<ng-template #areaEditMenu>
   <mat-card>
     <mat-card-content cdkMenu>
       <mat-action-list>
@@ -41,11 +48,36 @@
     </mat-card-content>
   </mat-card>
 </ng-template>
-<ng-template #object>
+
+<ng-template #areaDeleteMenu>
+  <mat-card>
+    <mat-card-content cdkMenu>
+      <mat-action-list>
+        <button *ngFor="let area of areas()" mat-list-item cdkMenuItem (click)="deleteArea(area)">
+          {{ area.title }}
+        </button>
+      </mat-action-list>
+    </mat-card-content>
+  </mat-card>
+</ng-template>
+
+<ng-template #objectEditMenu>
   <mat-card>
     <mat-card-content cdkMenu>
       <mat-action-list>
         <button *ngFor="let object of objects()" mat-list-item cdkMenuItem (click)="editObject(object)">
+          {{ object.title }}
+        </button>
+      </mat-action-list>
+    </mat-card-content>
+  </mat-card>
+</ng-template>
+
+<ng-template #objectDeleteMenu>
+  <mat-card>
+    <mat-card-content cdkMenu>
+      <mat-action-list>
+        <button *ngFor="let object of objects()" mat-list-item cdkMenuItem (click)="deleteObject(object)">
           {{ object.title }}
         </button>
       </mat-action-list>

@@ -14,7 +14,7 @@ import {
   type Observable,
 } from 'rxjs';
 import { type TravelMapModuleState } from '../../+state/+module-state';
-import { TravelMapAreasActions, travelMapAreasFeature } from '../../+state/travel-map-area.state';
+import { TravelMapAreasActions, travelMapAreasFeature } from '../../+state/travel-map-areas.state';
 import { TouchUiService } from '../../../utils/touch-ui.service';
 import { type Coordinates } from '../../interfaces/coordinates';
 import { type MapAreaEditState } from '../../interfaces/map-area-state';
