@@ -1,5 +1,4 @@
 import { inject, Injectable, type Signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { type TravelMapModuleState } from '../../+state/+module-state';
 import { travelMapAreasFeature } from '../../+state/travel-map-areas.state';
@@ -14,18 +13,12 @@ export class AreaEditRendererService implements Renderer {
   private readonly meshService: MeshRendererService = inject(MeshRendererService);
   private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   private readonly plusMinusLineWidth = 15;
-  private readonly meshState: Signal<TravelMapMeshState> = toSignal(
-    this.store.select(travelMapMeshFeature.name),
-    {
-      requireSync: true,
-    },
+  private readonly meshState: Signal<TravelMapMeshState> = this.store.selectSignal(
+    travelMapMeshFeature.selectTravelMapMeshState,
   );
 
-  private readonly editAreaState: Signal<MapAreaEditState | null> = toSignal(
-    this.store.select(travelMapAreasFeature.selectEditArea),
-    {
-      requireSync: true,
-    },
+  private readonly editAreaState: Signal<MapAreaEditState | null> = this.store.selectSignal(
+    travelMapAreasFeature.selectEditArea,
   );
 
   private editAreaRender: {

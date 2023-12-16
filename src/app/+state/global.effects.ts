@@ -24,8 +24,8 @@ function migrateState(state: AppStateVersioned): AppStateVersioned {
 
 @Injectable()
 export class GlobalEffects {
-  private readonly actions$: Actions = inject(Actions);
-  private readonly store: Store<Record<string, unknown>> = inject(Store);
+  private readonly actions$: Actions = inject<Actions>(Actions);
+  private readonly store: Store<Record<string, unknown>> = inject<Store<Record<string, unknown>>>(Store);
   private persistState = false;
 
   activateStatePersistence$ = createEffect(

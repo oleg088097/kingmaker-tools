@@ -1,8 +1,13 @@
 import { type OverlayRef } from '@angular/cdk/overlay';
-import { ChangeDetectionStrategy, Component, inject, InjectionToken, type Signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  InjectionToken,
+  type Signal,
+} from '@angular/core';
 import { Store } from '@ngrx/store';
-import { combineLatest, map, takeUntil } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { type TravelMapModuleState } from '../+state/+module-state';
 import { TravelMapAreasActions, travelMapAreasFeature } from '../+state/travel-map-areas.state';
@@ -39,43 +44,27 @@ export class ContextMenuComponent {
   private readonly data: ContextMenuData = inject(CONTEXT_MENU_DATA);
   private readonly overlayRef: OverlayRef = inject(OVERLAY_REF);
   private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
-  private readonly destroy$ = inject(DestroyService);
+  protected mesh: Signal<MeshElementState | null> = this.store.selectSignal(
+    travelMapMeshFeature.selectMeshById(this.data.meshId),
+  );
+
+  protected areas: Signal<MapAreaState[]> = this.store.selectSignal(
+    travelMapAreasFeature.selectAreasByIds(this.data.areaIds),
+  );
+
+  protected objects: Signal<MapObjectState[]> = this.store.selectSignal(
+    travelMapObjectsFeature.selectObjectsByIds(this.data.objectIds),
+  );
+
   private readonly meshRelativeCoordsCalcService: MeshRelativeCoordsCalcService = inject(
     MeshRelativeCoordsCalcService,
   );
 
-  protected mesh: Signal<MeshElementState | null> = toSignal(
-    this.store.select(travelMapMeshFeature.selectMeshMap).pipe(
-      map((meshMap) => (this.data.meshId !== undefined ? meshMap[this.data.meshId] : null)),
-      takeUntil(this.destroy$),
-    ),
-    { requireSync: true },
-  );
+  private readonly selectEditObject = this.store.selectSignal(travelMapObjectsFeature.selectEditObject);
+  private readonly selectEditArea = this.store.selectSignal(travelMapAreasFeature.selectEditArea);
 
-  protected areas: Signal<MapAreaState[]> = toSignal(
-    this.store.select(travelMapAreasFeature.selectAreas).pipe(
-      map((areaMap) => this.data.areaIds.map((areaId) => areaMap[areaId])),
-      takeUntil(this.destroy$),
-    ),
-    { requireSync: true },
-  );
-
-  protected objects: Signal<MapObjectState[]> = toSignal(
-    this.store.select(travelMapObjectsFeature.selectObjects).pipe(
-      map((areaMap) => this.data.objectIds.map((objectId) => areaMap[objectId])),
-      takeUntil(this.destroy$),
-    ),
-    { requireSync: true },
-  );
-
-  protected hasEditState: Signal<boolean> = toSignal(
-    combineLatest([
-      this.store.select(travelMapObjectsFeature.selectEditObject),
-      this.store.select(travelMapAreasFeature.selectEditArea),
-    ]).pipe(map(([editObject, editArea]) => Boolean(editObject ?? editArea))),
-    {
-      requireSync: true,
-    },
+  protected readonly hasEditState: Signal<boolean> = computed(() =>
+    Boolean(this.selectEditObject() ?? this.selectEditArea()),
   );
 
   protected switchFogForMeshElement(mesh: MeshElementState): void {

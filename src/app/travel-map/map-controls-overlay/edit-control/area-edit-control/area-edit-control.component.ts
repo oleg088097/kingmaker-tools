@@ -20,11 +20,8 @@ export class AreaEditControlComponent {
   private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   private readonly destroy$ = inject(DestroyService);
 
-  protected readonly editAreaState: Signal<MapAreaEditState | null> = toSignal(
-    this.store.select(travelMapAreasFeature.selectEditArea),
-    {
-      requireSync: true,
-    },
+  protected readonly editAreaState: Signal<MapAreaEditState | null> = this.store.selectSignal(
+    travelMapAreasFeature.selectEditArea,
   );
 
   protected readonly areaForm = new FormGroup({

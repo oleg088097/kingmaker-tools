@@ -1,4 +1,4 @@
-import { createActionGroup, createFeature, createReducer, on, props } from '@ngrx/store';
+import { createActionGroup, createFeature, createReducer, createSelector, on, props } from '@ngrx/store';
 import { cloneDeep } from 'lodash';
 import { type MeshElementState } from '../interfaces/mesh-element-state';
 import { AXIS, MESH_TYPE, ROW_TYPE, type MeshProperties } from '../interfaces/travel-map-data';
@@ -100,4 +100,8 @@ export const travelMapMeshFeature = createFeature({
       };
     }),
   ),
+  extraSelectors: ({ selectMeshMap }) => ({
+    selectMeshById: (meshId: string | undefined) =>
+      createSelector(selectMeshMap, (meshMap) => (meshId !== undefined ? meshMap[meshId] : null)),
+  }),
 });

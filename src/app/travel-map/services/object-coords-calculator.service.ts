@@ -1,5 +1,4 @@
 import { inject, type Signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { type TravelMapModuleState } from '../+state/+module-state';
 import { travelMapDisplaySettingsFeature } from '../+state/travel-map-display-settings.state';
@@ -11,19 +10,12 @@ import { MeshRendererService } from './renderers/mesh-renderer.service';
 export class ObjectCoordsCalculatorService {
   private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   private readonly meshService: MeshRendererService = inject(MeshRendererService);
-
-  protected readonly scale: Signal<number> = toSignal(
-    this.store.select(travelMapDisplaySettingsFeature.selectScale),
-    {
-      requireSync: true,
-    },
+  protected readonly scale: Signal<number> = this.store.selectSignal(
+    travelMapDisplaySettingsFeature.selectScale,
   );
 
-  private readonly meshState: Signal<TravelMapMeshState> = toSignal(
-    this.store.select(travelMapMeshFeature.name),
-    {
-      requireSync: true,
-    },
+  private readonly meshState: Signal<TravelMapMeshState> = this.store.selectSignal(
+    travelMapMeshFeature.selectTravelMapMeshState,
   );
 
   public getIconSize(): number {

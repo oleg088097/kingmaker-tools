@@ -1,8 +1,6 @@
 import { moveItemInArray, type CdkDragDrop } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, inject, type Signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
-import { takeUntil } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { type CampingCalculationModuleState } from '../../../+state/+module-state';
 import { WatchChecksActions, watchChecksFeature } from '../../../+state/watch-checks.state';
@@ -17,14 +15,11 @@ import { type CampingCalculationDataWatchCheck } from '../../../interfaces/campi
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WatchChecksListEditComponent {
-  protected store: Store<CampingCalculationModuleState> = inject(Store);
+  protected store: Store<CampingCalculationModuleState> = inject<Store<CampingCalculationModuleState>>(Store);
   protected destroy$ = inject(DestroyService);
 
-  protected watchChecksStateChecks: Signal<CampingCalculationDataWatchCheck[]> = toSignal(
-    this.store.select(watchChecksFeature.selectChecks).pipe(takeUntil(this.destroy$)),
-    {
-      requireSync: true,
-    },
+  protected watchChecksStateChecks: Signal<CampingCalculationDataWatchCheck[]> = this.store.selectSignal(
+    watchChecksFeature.selectChecks,
   );
 
   protected onTitleChange(check: CampingCalculationDataWatchCheck, event: Event): void {

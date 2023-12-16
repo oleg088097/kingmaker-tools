@@ -30,7 +30,7 @@ import { type WatchResultChange } from './watch-checks/watch-checks.component';
 export class CampingCalculationComponent {
   protected destroy$ = inject(DestroyService);
   protected campingCalculationData: WritableSignal<CampingCalculationData | null> = signal(null);
-  protected store: Store<CampingCalculationModuleState> = inject(Store);
+  protected store: Store<CampingCalculationModuleState> = inject<Store<CampingCalculationModuleState>>(Store);
   private readonly httpClient: HttpClient = inject(HttpClient);
 
   protected campingResultControl = new FormControl<CampingResultsChange | null>(null, {

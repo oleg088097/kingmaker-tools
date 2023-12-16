@@ -10,7 +10,6 @@ import {
   type Signal,
   type WritableSignal,
 } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { takeUntil } from 'rxjs';
@@ -55,14 +54,8 @@ export class RandomEncounterCheckComponent {
   protected checkResult: WritableSignal<CheckResult | undefined> = signal(undefined);
   protected checkOutdated: WritableSignal<boolean> = signal(false);
   protected store: Store<CampingCalculationModuleState> = inject<Store<CampingCalculationModuleState>>(Store);
-  protected randomEncounterCheckState: Signal<RandomEncounterCheckState> = toSignal(
-    this.store.select(randomEncounterCheckFeature.name).pipe(takeUntil(this.destroy$)),
-    {
-      initialValue: {
-        flatDc: 15,
-        campingChecksDependencies: {},
-      },
-    },
+  protected randomEncounterCheckState: Signal<RandomEncounterCheckState> = this.store.selectSignal(
+    randomEncounterCheckFeature.selectRandomEncounterCheckState,
   );
 
   private readonly skillCheckPerformerService: CheckPerformerService = inject(CheckPerformerService);

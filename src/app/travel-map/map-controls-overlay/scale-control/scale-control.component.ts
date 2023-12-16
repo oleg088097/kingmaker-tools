@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, effect, inject, untracked, type Signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { distinctUntilChanged, takeUntil } from 'rxjs';
@@ -25,11 +24,8 @@ export class ScaleControlComponent {
   private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   private readonly destroy$ = inject(DestroyService);
   protected readonly scaleControl = new FormControl<number>(1, { nonNullable: true });
-  protected readonly scale: Signal<number> = toSignal(
-    this.store.select(travelMapDisplaySettingsFeature.selectScale),
-    {
-      requireSync: true,
-    },
+  protected readonly scale: Signal<number> = this.store.selectSignal(
+    travelMapDisplaySettingsFeature.selectScale,
   );
 
   public constructor() {

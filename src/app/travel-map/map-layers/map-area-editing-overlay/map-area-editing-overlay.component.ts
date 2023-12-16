@@ -18,7 +18,7 @@ export class MapAreaEditingOverlayDirective {
   private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   private readonly destroy$ = inject(DestroyService);
 
-  constructor(private readonly host: MapSimpleOverlayComponent) {
+  constructor(readonly host: MapSimpleOverlayComponent) {
     this.store
       .select(travelMapAreasFeature.selectEditArea)
       .pipe(takeUntil(this.destroy$))

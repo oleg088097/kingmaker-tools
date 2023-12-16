@@ -1,5 +1,4 @@
 import { Injectable, inject, type OnDestroy, type Signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import {
   Subject,
@@ -31,11 +30,8 @@ export class AreaEditorPluginService implements CanvasManagerPlugin, OnDestroy {
   private readonly canvasElementsGetterService = inject(CanvasElementsGetterService);
   private readonly pointerMoveMeshIds: Set<string> = new Set<string>();
   private readonly destroyMoveUpListeners$: Subject<void> = new Subject<void>();
-  private readonly editAreaState: Signal<MapAreaEditState | null> = toSignal(
-    this.store.select(travelMapAreasFeature.selectEditArea),
-    {
-      requireSync: true,
-    },
+  private readonly editAreaState: Signal<MapAreaEditState | null> = this.store.selectSignal(
+    travelMapAreasFeature.selectEditArea,
   );
 
   private readonly editAreaCanvasCombination: Observable<

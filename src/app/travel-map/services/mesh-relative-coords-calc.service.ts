@@ -1,5 +1,4 @@
 import { inject, Injectable, type Signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { type TravelMapModuleState } from '../+state/+module-state';
 import { travelMapDisplaySettingsFeature } from '../+state/travel-map-display-settings.state';
@@ -9,11 +8,8 @@ import { MeshRendererService } from './renderers/mesh-renderer.service';
 export class MeshRelativeCoordsCalcService {
   private readonly meshService: MeshRendererService = inject(MeshRendererService);
   private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
-  protected readonly scale: Signal<number> = toSignal(
-    this.store.select(travelMapDisplaySettingsFeature.selectScale),
-    {
-      requireSync: true,
-    },
+  protected readonly scale: Signal<number> = this.store.selectSignal(
+    travelMapDisplaySettingsFeature.selectScale,
   );
 
   public calculateRelativeCoordinates(

@@ -10,7 +10,6 @@ import {
   type Signal,
   type WritableSignal,
 } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { takeUntil } from 'rxjs';
@@ -65,17 +64,14 @@ export class CampingChecksComponent {
 
   protected checksOutdated: WritableSignal<boolean> = signal(false);
   protected displayedColumns: string[] = ['title', 'modifier', 'dc', 'outcome'];
-  protected store: Store<CampingCalculationModuleState> = inject(Store);
-  protected checkResults: WritableSignal<Map<string, CheckResult>> = signal(new Map());
-  protected checksInfo: WritableSignal<Map<string, CampingCalculationDataCampingCheck>> = signal(new Map());
-  protected campingChecksState: Signal<CampingChecksState> = toSignal(
-    this.store.select(campingChecksFeature.name).pipe(takeUntil(this.destroy$)),
-    {
-      initialValue: {
-        checks: [],
-        commonDc: 20,
-      },
-    },
+  protected store: Store<CampingCalculationModuleState> = inject<Store<CampingCalculationModuleState>>(Store);
+  protected checkResults: WritableSignal<Map<string, CheckResult>> = signal(new Map<string, CheckResult>());
+  protected checksInfo: WritableSignal<Map<string, CampingCalculationDataCampingCheck>> = signal(
+    new Map<string, CampingCalculationDataCampingCheck>(),
+  );
+
+  protected campingChecksState: Signal<CampingChecksState> = this.store.selectSignal(
+    campingChecksFeature.selectCampingChecksState,
   );
 
   private readonly skillCheckPerformerService: CheckPerformerService = inject(CheckPerformerService);

@@ -1,5 +1,4 @@
 import { inject, Injectable, type Signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { type TravelMapModuleState } from '../../+state/+module-state';
 import { travelMapAreasFeature } from '../../+state/travel-map-areas.state';
@@ -12,11 +11,8 @@ import { type Renderer } from './renderer';
 export class AreaRendererService implements Renderer {
   private readonly meshService: MeshRendererService = inject(MeshRendererService);
   private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
-  private readonly areasState: Signal<Record<string, MapAreaState>> = toSignal(
-    this.store.select(travelMapAreasFeature.selectAreas),
-    {
-      requireSync: true,
-    },
+  private readonly areasState: Signal<Record<string, MapAreaState>> = this.store.selectSignal(
+    travelMapAreasFeature.selectAreas,
   );
 
   private readonly areaRenderMap = new Map<string, Path2D>();

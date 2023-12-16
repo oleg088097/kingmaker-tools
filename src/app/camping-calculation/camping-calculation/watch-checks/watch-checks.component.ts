@@ -13,7 +13,6 @@ import {
   type Signal,
   type WritableSignal,
 } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, Validators } from '@angular/forms';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { Store } from '@ngrx/store';
@@ -68,11 +67,8 @@ export class WatchChecksComponent {
   protected store: Store<CampingCalculationModuleState> = inject<Store<CampingCalculationModuleState>>(Store);
   private readonly isTouchUI: Signal<boolean> = inject(TouchUiService).isTouchUI;
   protected checkResult: WritableSignal<WatchCheckResult | null> = signal(null);
-  protected watchChecksState: Signal<WatchChecksState> = toSignal(
-    this.store.select(watchChecksFeature.name).pipe(takeUntil(this.destroy$)),
-    {
-      requireSync: true,
-    },
+  protected watchChecksState: Signal<WatchChecksState> = this.store.selectSignal(
+    watchChecksFeature.selectWatchChecksState,
   );
 
   protected enabledChecks: Signal<CampingCalculationDataWatchCheck[]> = computed(() =>

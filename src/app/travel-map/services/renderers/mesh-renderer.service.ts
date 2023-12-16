@@ -1,5 +1,4 @@
 import { computed, inject, Injectable, type Signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { type TravelMapModuleState } from '../../+state/+module-state';
 import {
@@ -15,16 +14,12 @@ import { type Renderer } from './renderer';
 @Injectable()
 export class MeshRendererService implements Renderer {
   private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
-  private readonly displaySettings: Signal<TravelMapDisplaySettingsState> = toSignal(
-    this.store.select(travelMapDisplaySettingsFeature.name),
-    { requireSync: true },
+  private readonly displaySettings: Signal<TravelMapDisplaySettingsState> = this.store.selectSignal(
+    travelMapDisplaySettingsFeature.selectTravelMapDisplaySettingsState,
   );
 
-  private readonly meshState: Signal<TravelMapMeshState> = toSignal(
-    this.store.select(travelMapMeshFeature.name),
-    {
-      requireSync: true,
-    },
+  private readonly meshState: Signal<TravelMapMeshState> = this.store.selectSignal(
+    travelMapMeshFeature.selectTravelMapMeshState,
   );
 
   private readonly impl: Signal<MeshAdapterStrategy> = computed(() => {

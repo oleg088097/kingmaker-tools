@@ -1,4 +1,4 @@
-import { createActionGroup, createFeature, createReducer, on, props } from '@ngrx/store';
+import { createActionGroup, createFeature, createReducer, createSelector, on, props } from '@ngrx/store';
 import { cloneDeep } from 'lodash';
 import { GlobalActions, UPDATE_ACTION_CREATOR } from '../../+state/global.actions';
 import { type MapAreaEditState, type MapAreaState } from '../interfaces/map-area-state';
@@ -86,4 +86,8 @@ export const travelMapAreasFeature = createFeature({
       };
     }),
   ),
+  extraSelectors: ({ selectAreas }) => ({
+    selectAreasByIds: (areaIds: string[]) =>
+      createSelector(selectAreas, (areasMap) => areaIds.map((id) => areasMap[id])),
+  }),
 });

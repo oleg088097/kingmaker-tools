@@ -1,5 +1,4 @@
 import { computed, effect, inject, Injectable, signal, type WritableSignal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { type TravelMapModuleState } from '../+state/+module-state';
 import { travelMapDisplaySettingsFeature } from '../+state/travel-map-display-settings.state';
@@ -20,13 +19,9 @@ export interface CanvasManager {
 @Injectable()
 export class CanvasManagerProviderService {
   private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
-  protected readonly scale = toSignal(this.store.select(travelMapDisplaySettingsFeature.selectScale), {
-    requireSync: true,
-  });
+  protected readonly scale = this.store.selectSignal(travelMapDisplaySettingsFeature.selectScale);
 
-  protected readonly travelMapImageState = toSignal(this.store.select(travelMapImageFeature.selectImage), {
-    requireSync: true,
-  });
+  protected readonly travelMapImageState = this.store.selectSignal(travelMapImageFeature.selectImage);
 
   public readonly canvasWidth = computed(() => this.scale() * this.travelMapImageState().width);
   public readonly canvasHeight = computed(() => this.scale() * this.travelMapImageState().height);

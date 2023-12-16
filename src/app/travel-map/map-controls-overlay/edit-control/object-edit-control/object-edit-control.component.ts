@@ -32,11 +32,8 @@ export class ObjectEditControlComponent {
     [ICON_TYPE.creature]: 'Существа',
   };
 
-  protected readonly editObjectState: Signal<MapObjectEditState | null> = toSignal(
-    this.store.select(travelMapObjectsFeature.selectEditObject),
-    {
-      requireSync: true,
-    },
+  protected readonly editObjectState: Signal<MapObjectEditState | null> = this.store.selectSignal(
+    travelMapObjectsFeature.selectEditObject,
   );
 
   protected readonly objectForm = new FormGroup({

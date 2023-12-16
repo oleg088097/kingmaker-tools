@@ -1,5 +1,4 @@
 import { inject, Injectable, type OnDestroy, type Signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
 import { Subject, takeUntil } from 'rxjs';
 import { type TravelMapModuleState } from '../../+state/+module-state';
@@ -15,6 +14,10 @@ export class ObjectEditRendererService implements Renderer, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   private readonly store: Store<TravelMapModuleState> = inject<Store<TravelMapModuleState>>(Store);
   private readonly iconRegistry: MapIconRegistryService = inject(MapIconRegistryService);
+  private readonly editObjectState: Signal<MapObjectEditState | null> = this.store.selectSignal(
+    travelMapObjectsFeature.selectEditObject,
+  );
+
   private readonly objectCoordsCalculatorService: ObjectCoordsCalculatorService = inject(
     ObjectCoordsCalculatorService,
   );
@@ -22,13 +25,6 @@ export class ObjectEditRendererService implements Renderer, OnDestroy {
   public ngOnDestroy(): void {
     this.destroy$.next();
   }
-
-  private readonly editObjectState: Signal<MapObjectEditState | null> = toSignal(
-    this.store.select(travelMapObjectsFeature.selectEditObject),
-    {
-      requireSync: true,
-    },
-  );
 
   private editObjectRender: {
     path: Path2D;
