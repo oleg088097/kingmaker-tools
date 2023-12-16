@@ -1,5 +1,5 @@
 import { createActionGroup, createFeature, createReducer, createSelector, on, props } from '@ngrx/store';
-import { cloneDeep } from 'lodash';
+import { cloneDeep } from 'lodash-es';
 import { type MeshElementState } from '../interfaces/mesh-element-state';
 import { AXIS, MESH_TYPE, ROW_TYPE, type MeshProperties } from '../interfaces/travel-map-data';
 import { convertCoordinatesToMeshId } from '../utils/mesh-id-converter';

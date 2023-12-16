@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal, type WritableSignal } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { isEqual } from 'lodash';
+import { isEqual } from 'lodash-es';
 import { distinctUntilChanged, takeUntil } from 'rxjs';
 import { type TravelMapModuleState } from '../../+state/+module-state';
 import {

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, type Signal } fro
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { isEqual } from 'lodash';
+import { isEqual } from 'lodash-es';
 import { distinctUntilChanged, filter, first, map, startWith, takeUntil } from 'rxjs';
 import { type TravelMapModuleState } from '../../../+state/+module-state';
 import { TravelMapAreasActions, travelMapAreasFeature } from '../../../+state/travel-map-areas.state';

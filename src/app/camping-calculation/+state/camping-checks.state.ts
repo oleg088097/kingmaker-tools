@@ -1,5 +1,5 @@
 import { createActionGroup, createFeature, createReducer, on, props } from '@ngrx/store';
-import { cloneDeep } from 'lodash';
+import { cloneDeep } from 'lodash-es';
 import {
   type CampingCalculationData,
   type CheckDescriptionCamping,
