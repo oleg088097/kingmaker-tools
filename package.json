@@ -3,12 +3,12 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test",
+    "start": "nx serve",
+    "build": "nx build",
+    "watch": "nx build --watch --configuration development",
+    "test": "nx test",
     "prepare": "husky install",
-    "lint": "ng lint"
+    "lint": "nx lint"
   },
   "private": true,
   "dependencies": {
@@ -36,6 +36,8 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^17.0.7",
+    "@angular-devkit/core": "^17.0.7",
+    "@angular-devkit/schematics": "^17.0.7",
     "@angular-eslint/builder": "^17.1.1",
     "@angular-eslint/eslint-plugin": "^17.1.1",
     "@angular-eslint/eslint-plugin-template": "^17.1.1",
@@ -43,6 +45,9 @@
     "@angular-eslint/template-parser": "^17.1.1",
     "@angular/cli": "^17.0.7",
     "@angular/compiler-cli": "^17.0.7",
+    "@nx/angular": "v17.2.5",
+    "@nx/workspace": "v17.2.5",
+    "@schematics/angular": "^17.0.7",
     "@types/jasmine": "~4.3.0",
     "@types/lodash-es": "^4.17.12",
     "@types/uuid": "^9.0.3",
@@ -63,6 +68,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.0.0",
     "lint-staged": "^14.0.1",
+    "nx": "v17.2.5",
     "prettier": "3.0.3",
     "prettier-plugin-organize-imports": "^3.2.3",
     "typescript": "^5.2.2"
