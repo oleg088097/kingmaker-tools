@@ -1,11 +1,11 @@
 /* eslint-env node */
 module.exports = {
   root: true,
-  ignorePatterns: ['projects/**/*'],
+  ignorePatterns: ["**/*"],
   overrides: [
     {
       files: ['*.ts'],
-      plugins: ['prettier', 'rxjs', 'unused-imports'],
+      plugins: ['prettier', 'rxjs', 'unused-imports', '@nx'],
       extends: [
         'standard-with-typescript',
         'plugin:prettier/recommended',
@@ -16,7 +16,10 @@ module.exports = {
       ],
       parser: '@typescript-eslint/parser',
       parserOptions: {
-        project: true,
+        project: [
+          './tsconfig.json',
+          './modules/*/tsconfig.*?.json',
+        ],
         tsconfigRootDir: __dirname,
         ecmaVersion: 'latest',
         sourceType: 'module',
@@ -29,6 +32,7 @@ module.exports = {
         '@typescript-eslint/promise-function-async': 'off',
         '@typescript-eslint/no-inferrable-types': 'off',
         'accessor-pairs': 'off',
+        '@typescript-eslint/no-non-null-assertion': 'off',
         '@typescript-eslint/consistent-type-imports': [
           'error',
           {
@@ -56,6 +60,46 @@ module.exports = {
             style: 'kebab-case',
           },
         ],
+        "@nx/enforce-module-boundaries": [
+          "error",
+          {
+            "allow": [],
+            "depConstraints": [
+              {
+                "sourceTag": "domain:camping",
+                "onlyDependOnLibsWithTags": ["domain:camping", "domain:GLOBAL"]
+              },
+              {
+                "sourceTag": "domain:travel-map",
+                "onlyDependOnLibsWithTags": ["domain:travel-map", "domain:GLOBAL"]
+              },
+              {
+                "sourceTag": "layer:apps",
+                "notDependOnLibsWithTags": ["layer:apps"]
+              },
+              {
+                "sourceTag": "layer:pages",
+                "notDependOnLibsWithTags": ["layer:apps", "layer:pages"]
+              },
+              {
+                "sourceTag": "layer:widgets",
+                "notDependOnLibsWithTags": ["layer:apps", "layer:pages", "layer:widgets"]
+              },
+              {
+                "sourceTag": "layer:features",
+                "notDependOnLibsWithTags": ["layer:apps", "layer:pages", "layer:widgets", "layer:features"]
+              },
+              {
+                "sourceTag": "layer:entities",
+                "notDependOnLibsWithTags": ["layer:apps", "layer:pages", "layer:widgets", "layer:features", "layer:entities"]
+              },
+              {
+                "sourceTag": "layer:shared",
+                "notDependOnLibsWithTags": ["layer:apps", "layer:pages", "layer:widgets", "layer:features", "layer:entities", "layer:shared"]
+              },
+            ]
+          }
+        ]
       },
     },
     {

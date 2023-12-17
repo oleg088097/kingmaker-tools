@@ -1,0 +1,14 @@
+{
+  "name": "shared_touch-ui-service",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "modules/shared/shared_touch-ui-service/src",
+  "prefix": "lib",
+  "tags": ["layer:shared", "domain:GLOBAL"],
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    }
+  }
+}

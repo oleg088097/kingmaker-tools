@@ -1,0 +1,14 @@
+{
+  "name": "pages_camping_camping-calculation",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "modules/pages/camping/camping-calculation/src",
+  "prefix": "lib",
+  "tags": ["layer:pages", "domain:camping"],
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    }
+  }
+}

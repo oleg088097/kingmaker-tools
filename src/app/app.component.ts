@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { from, takeUntil } from 'rxjs';
-import { GlobalActions } from './+state/global.actions';
-import { DestroyService } from './utils/destroy.service';
+import { DestroyService } from 'shared_destroy-service';
+import { GlobalActions } from 'shared_state-persistence';
 
 @Component({
   selector: 'app-root',

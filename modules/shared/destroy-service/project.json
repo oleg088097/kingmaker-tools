@@ -1,0 +1,14 @@
+{
+  "name": "shared_destroy-service",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "modules/shared/destroy-service/src",
+  "prefix": "lib",
+  "tags": ["layer:shared", "domain:GLOBAL"],
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    }
+  }
+}

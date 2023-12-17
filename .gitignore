@@ -44,3 +44,5 @@ Thumbs.db
 #Nx
 /.nx-cache
 /.nx
+
+.angular

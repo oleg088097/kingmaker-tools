@@ -1,0 +1,14 @@
+{
+  "name": "pages_travel-map_travel-map",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "modules/pages/travel-map/travel-map/src",
+  "prefix": "lib",
+  "tags": ["layer:pages", "domain:travel-map"],
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    }
+  }
+}

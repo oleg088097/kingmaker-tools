@@ -9,8 +9,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { type ActionReducerMap } from '@ngrx/store/src/models';
-import { GlobalEffects } from './+state/global.effects';
-import { loadStoreStateMetaReducer } from './+state/load-store-state-meta-reducer';
+import { GlobalEffects, loadStoreStateMetaReducer } from 'shared_state-persistence';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 

@@ -1,0 +1,23 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "ES2022",
+    "lib": ["ES2022", "dom"],
+    "baseUrl": "./",
+    "paths": {
+      "pages_camping_camping-calculation": ["modules/pages/camping/camping-calculation/src/index.ts"],
+      "pages_travel-map_travel-map": ["modules/pages/travel-map/travel-map/src/index.ts"],
+      "shared_confirm-component": ["modules/shared/confirm-component/src/index.ts"],
+      "shared_destroy-service": ["modules/shared/destroy-service/src/index.ts"],
+      "shared_state-persistence": ["modules/shared/state-persistence/src/index.ts"],
+      "shared_touch-ui-service": ["modules/shared/touch-ui-service/src/index.ts"]
+    }
+  }
+}
